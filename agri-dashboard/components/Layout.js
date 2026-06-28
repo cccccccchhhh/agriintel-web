@@ -16,6 +16,9 @@ export default function Layout({ children }) {
             <Link href="/ruled-based" className="hover:underline">
               Cek Manual
             </Link>
+            <Link href="/compare" className="hover:underline">
+              Bandingkan
+            </Link>
           </nav>
         </div>
       </header>
