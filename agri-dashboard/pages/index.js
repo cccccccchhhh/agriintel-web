@@ -5,11 +5,33 @@ import SearchBar from "../components/SearchBar";
 import StatCard from "../components/StatCard";
 import Badge from "../components/Badge";
 import Link from "next/link";
-import { getKabupatenList, getKomoditasList, getStats, getAllNamaKomoditas } from "../lib/data";
+import { useState, useMemo } from "react";
+import { getKabupatenList, getKomoditasList, getStats, getAllNamaKomoditas, getAllRekomendasi } from "../lib/data";
 import { TREN_LABEL } from "../lib/constants";
 
 export default function Home({ kabupatenList, komoditasList, stats, namaKomoditasMap }) {
+  const [provinsi, setProvinsi] = useState("");
   const sortedKomoditas = [...komoditasList].sort((a, b) => b.slope - a.slope);
+
+  const provinsiList = useMemo(() => {
+    const set = new Set(kabupatenList.map((k) => k.provinsi));
+    return [...set].sort();
+  }, [kabupatenList]);
+
+  const filteredKabupaten = useMemo(
+    () => (provinsi ? kabupatenList.filter((k) => k.provinsi === provinsi) : kabupatenList),
+    [provinsi, kabupatenList]
+  );
+
+  const displayStats = useMemo(() => {
+    if (!provinsi) return stats;
+    return {
+      n_kabupaten_total: filteredKabupaten.length,
+      n_kabupaten_rekomendasi_kuat: filteredKabupaten.filter((k) => k.has_kuat).length,
+      n_kabupaten_rekomendasi_lemah: filteredKabupaten.filter((k) => k.has_lemah).length,
+      n_komoditas: stats.n_komoditas,
+    };
+  }, [provinsi, filteredKabupaten, stats]);
 
   return (
     <Layout>
@@ -25,26 +47,48 @@ export default function Home({ kabupatenList, komoditasList, stats, namaKomodita
           Cari kabupaten/kota kamu untuk melihat rekomendasi komoditas tanam berdasarkan forecast
           cuaca, kesesuaian lahan (FAO/ECOCROP), dan tren permintaan pasar nasional.
         </p>
-        <div className="flex justify-center">
-          <SearchBar kabupatenList={kabupatenList} autoFocus />
+        <div className="flex flex-col items-center gap-3">
+          <select
+            value={provinsi}
+            onChange={(e) => setProvinsi(e.target.value)}
+            className="w-full max-w-xl border border-gray-300 rounded-lg px-4 py-2.5 text-sm bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-600 text-gray-700"
+          >
+            <option value="">Semua Provinsi</option>
+            {provinsiList.map((p) => (
+              <option key={p} value={p}>{p}</option>
+            ))}
+          </select>
+          <SearchBar kabupatenList={filteredKabupaten} autoFocus />
         </div>
+        {provinsi && (
+          <p className="text-sm text-green-700 mt-3">
+            Menampilkan <strong>{filteredKabupaten.length}</strong> kabupaten/kota di{" "}
+            <strong>{provinsi}</strong>.{" "}
+            <button onClick={() => setProvinsi("")} className="underline text-gray-500">
+              Reset
+            </button>
+          </p>
+        )}
       </section>
 
       <section className="grid grid-cols-2 md:grid-cols-4 gap-4 my-8">
-        <StatCard label="Kabupaten/Kota Dianalisis" value={stats.n_kabupaten_total} />
+        <StatCard
+          label={provinsi ? "Kab/Kota di Provinsi Ini" : "Kabupaten/Kota Dianalisis"}
+          value={displayStats.n_kabupaten_total}
+        />
         <StatCard
           label="Rekomendasi Kuat"
-          value={stats.n_kabupaten_rekomendasi_kuat}
+          value={displayStats.n_kabupaten_rekomendasi_kuat}
           sub="kabupaten punya ≥1 komoditas"
           color="#16a34a"
         />
         <StatCard
           label="Rekomendasi Lemah"
-          value={stats.n_kabupaten_rekomendasi_lemah}
+          value={displayStats.n_kabupaten_rekomendasi_lemah}
           sub="kabupaten punya ≥1 komoditas"
           color="#ca8a04"
         />
-        <StatCard label="Komoditas Dianalisis" value={stats.n_komoditas} color="#0369a1" />
+        <StatCard label="Komoditas Dianalisis" value={displayStats.n_komoditas} color="#0369a1" />
       </section>
 
       <section className="my-10">
@@ -107,8 +151,6 @@ export async function getStaticProps() {
   const komoditasList = getKomoditasList();
   const namaKomoditasLur = getAllNamaKomoditas();
 
-  // Map komoditas demand name → lur nama_komoditas (for URL slugs)
-  // Match by lowercased demand name inclusion
   const namaKomoditasMap = {};
   for (const k of komoditasList) {
     const lower = k.komoditas.toLowerCase();
@@ -118,9 +160,21 @@ export async function getStaticProps() {
     if (match) namaKomoditasMap[k.komoditas] = match;
   }
 
+  const rekomendasiAll = getAllRekomendasi();
+  const rekMap = Object.fromEntries(rekomendasiAll.map((r) => [r.kode_kab, r]));
+
+  const kabupatenList = getKabupatenList().map((k) => {
+    const rek = rekMap[k.kode_kab];
+    return {
+      ...k,
+      has_kuat: rek ? (rek.rekomendasi_kuat?.length ?? 0) > 0 : false,
+      has_lemah: rek ? (rek.rekomendasi_lemah?.length ?? 0) > 0 : false,
+    };
+  });
+
   return {
     props: {
-      kabupatenList: getKabupatenList(),
+      kabupatenList,
       komoditasList,
       stats: getStats(),
       namaKomoditasMap,
