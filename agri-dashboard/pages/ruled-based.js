@@ -1,12 +1,87 @@
 // pages/ruled-based.js
 import { useState, useMemo } from "react";
 import Head from "next/head";
-import Layout from "../components/Layout";
-import Badge from "../components/Badge";
+import Link from "next/link";
 import { getKabupatenList, getAllKabupatenLite, getLurList } from "../lib/data";
-import { KELAS_LABEL } from "../lib/constants";
 import { klasifikasiSemuaKomoditas, TEKSTUR_OPTIONS } from "../lib/classify";
 
+// ── Komoditas emoji lookup ─────────────────────────────────────────────────────
+const EMOJI_MAP = {
+  "padi": "🌾", "jagung": "🌽", "kedelai": "🫘", "kacang tanah": "🥜",
+  "kacang hijau": "🫘", "kacang panjang": "🫘", "ubi kayu": "🍠",
+  "ubi jalar": "🍠", "tebu": "🎋", "kelapa sawit": "🌴", "kelapa": "🥥",
+  "karet": "🌿", "kakao": "🍫", "kopi": "☕", "teh": "🍵",
+  "pisang": "🍌", "mangga": "🥭", "nanas": "🍍", "pepaya": "🍈",
+  "durian": "🍈", "cabai": "🌶️", "bawang merah": "🧅", "bawang putih": "🧄",
+  "tomat": "🍅", "kentang": "🥔", "wortel": "🥕", "sawi": "🥬",
+  "bayam": "🥬", "semangka": "🍉", "melon": "🍈", "lada": "🌶️",
+  "cengkeh": "🌸", "pala": "🌰", "vanili": "🌿", "jahe": "🫚",
+  "kunyit": "🫚", "kapas": "🪴", "tembakau": "🍃",
+};
+
+function getEmoji(nama) {
+  const lower = (nama || "").toLowerCase();
+  for (const [key, emoji] of Object.entries(EMOJI_MAP)) {
+    if (lower.includes(key)) return emoji;
+  }
+  return "🌱";
+}
+
+// ── Kelas styles ───────────────────────────────────────────────────────────────
+const KELAS_STY = {
+  S1: { badge: "bg-[#16a34a]/15 text-[#15803d]", card: "border-[#16a34a]/25", lf: "text-[#3f7553] font-semibold" },
+  S2: { badge: "bg-[#eab308]/18 text-[#a16207]", card: "border-[#eab308]/30", lf: "text-[#8a6d1f] font-semibold" },
+  N:  { badge: "bg-[#dc2626]/12 text-[#b91c1c]", card: "border-[#dc2626]/20", lf: "text-[#9a3b3b] font-semibold" },
+};
+const SORT_ORDER = { S1: 0, S2: 1, N: 2 };
+
+// ── Sub-components ─────────────────────────────────────────────────────────────
+function InputField({ label, unit, value, onChange, placeholder, type, step, manual }) {
+  return (
+    <label className="block">
+      <span className="flex items-center justify-between text-[12.5px] font-semibold text-[#3c5547] mb-1.5">
+        {label}
+        {unit && <span className="text-[11px] font-medium text-[#a7bbae]">{unit}</span>}
+      </span>
+      <input
+        type={type}
+        step={step}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className={`w-full rounded-xl px-3.5 py-2.5 text-[14px] font-semibold text-[#1a2e22] outline-none transition ${
+          manual
+            ? "bg-[#16a34a]/6 border-2 border-[#16a34a]/45 focus:border-[#16a34a]"
+            : "bg-[#faf7f0] border border-[#166534]/15 focus:border-[#166534]/40"
+        }`}
+      />
+      <span className={`block text-[10.5px] font-semibold mt-1 ${manual ? "text-[#15803d]" : "text-[#a7bbae]"}`}>
+        {manual ? "● diisi manual" : "default kabupaten"}
+      </span>
+    </label>
+  );
+}
+
+function Chip({ icon, label, value, manual }) {
+  return (
+    <div className={`inline-flex items-center gap-2.5 bg-white rounded-xl border px-3.5 py-2 ${
+      manual ? "border-[#16a34a]/35" : "border-[#166534]/10"
+    }`}>
+      <span className="text-[15px]">{icon}</span>
+      <span>
+        <span className="block text-[11px] font-medium text-[#8a9e92] leading-tight">{label}</span>
+        <span className="block text-[14px] font-extrabold text-[#143d27] leading-tight">{value ?? "—"}</span>
+      </span>
+      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+        manual ? "bg-[#16a34a]/12 text-[#15803d]" : "bg-[#166534]/6 text-[#8a9e92]"
+      }`}>
+        {manual ? "diisi manual" : "default kabupaten"}
+      </span>
+    </div>
+  );
+}
+
+// ── Page ───────────────────────────────────────────────────────────────────────
 export default function RuledBasedPage({ kabupatenList, kabupatenData, lurList }) {
   const [kodeKab, setKodeKab] = useState("");
   const [ph, setPh] = useState("");
@@ -14,194 +89,243 @@ export default function RuledBasedPage({ kabupatenList, kabupatenData, lurList }
   const [suhu, setSuhu] = useState("");
   const [elevasi, setElevasi] = useState("");
   const [tekstur, setTekstur] = useState("");
-  const [submitted, setSubmitted] = useState(false);
 
   const kabDefault = useMemo(
     () => kabupatenData.find((k) => k.kode_kab === Number(kodeKab)) || null,
     [kodeKab, kabupatenData]
   );
 
-  const indikatorFinal = useMemo(() => {
-    return {
-      ph: ph !== "" ? parseFloat(ph) : kabDefault?.ph ?? null,
-      ch_tahunan_mm: ch !== "" ? parseFloat(ch) : kabDefault?.ch_tahunan_mm ?? null,
-      suhu_c: suhu !== "" ? parseFloat(suhu) : kabDefault?.suhu_mean ?? null,
-      elevasi_m: elevasi !== "" ? parseFloat(elevasi) : kabDefault?.dem ?? null,
-      tekstur: tekstur !== "" ? tekstur : kabDefault?.tekstur_eng ?? null,
-    };
-  }, [ph, ch, suhu, elevasi, tekstur, kabDefault]);
+  const indikatorFinal = useMemo(() => ({
+    ph: ph !== "" ? parseFloat(ph) : kabDefault?.ph ?? null,
+    ch_tahunan_mm: ch !== "" ? parseFloat(ch) : kabDefault?.ch_tahunan_mm ?? null,
+    suhu_c: suhu !== "" ? parseFloat(suhu) : kabDefault?.suhu_mean ?? null,
+    elevasi_m: elevasi !== "" ? parseFloat(elevasi) : kabDefault?.dem ?? null,
+    tekstur: tekstur !== "" ? tekstur : kabDefault?.tekstur_eng ?? null,
+  }), [ph, ch, suhu, elevasi, tekstur, kabDefault]);
+
+  const hasAnyData = Object.values(indikatorFinal).some((v) => v !== null);
 
   const hasil = useMemo(() => {
-    if (!submitted) return [];
-    return klasifikasiSemuaKomoditas(indikatorFinal, lurList);
-  }, [submitted, indikatorFinal, lurList]);
+    if (!hasAnyData) return [];
+    return klasifikasiSemuaKomoditas(indikatorFinal, lurList)
+      .sort((a, b) => (SORT_ORDER[a.kelas] ?? 3) - (SORT_ORDER[b.kelas] ?? 3));
+  }, [indikatorFinal, lurList, hasAnyData]);
 
-  function handleSubmit(e) {
-    e.preventDefault();
-    setSubmitted(true);
+  function handleReset() {
+    setPh(""); setCh(""); setSuhu(""); setElevasi(""); setTekstur("");
   }
 
-  const fieldFilled = (v) => v !== "";
+  const m = { ph: ph !== "", ch: ch !== "", suhu: suhu !== "", elevasi: elevasi !== "", tekstur: tekstur !== "" };
 
   return (
-    <Layout>
+    <>
       <Head>
         <title>Cek Manual — AgriRekomendasi</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+        <style>{`
+          body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+          input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+          input[type=number] { -moz-appearance: textfield; }
+          .grain { background-image: radial-gradient(rgba(22,101,52,0.05) 1px, transparent 1px); background-size: 22px 22px; }
+        `}</style>
       </Head>
 
-      <h1 className="text-2xl font-bold text-green-900 mb-2">Cek Kesesuaian Lahan Manual</h1>
-      <p className="text-gray-500 mb-6 max-w-2xl">
-        Sudah ukur sendiri kondisi lahan kamu? Isi salah satu/semua indikator di bawah — kalau ada
-        yang dikosongkan, sistem akan otomatis memakai data rata-rata kabupaten yang kamu pilih
-        sebagai nilai default.
-      </p>
+      <div className="min-h-screen bg-[#faf7f0] text-[#1a2e22]">
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-5 mb-8 space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Pilih Kabupaten/Kota (untuk nilai default)
-          </label>
-          <select
-            value={kodeKab}
-            onChange={(e) => setKodeKab(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
-          >
-            <option value="">-- Pilih kabupaten --</option>
-            {kabupatenList.map((k) => (
-              <option key={k.kode_kab} value={k.kode_kab}>
-                {k.nama_kab} ({k.provinsi})
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-4">
-          <Field
-            label="pH Tanah"
-            value={ph}
-            onChange={setPh}
-            placeholder={kabDefault ? `Default: ${kabDefault.ph ?? "-"}` : "contoh: 6.2"}
-            type="number"
-            step="0.1"
-            filled={fieldFilled(ph)}
-          />
-          <Field
-            label="Curah Hujan Tahunan (mm/tahun)"
-            value={ch}
-            onChange={setCh}
-            placeholder={kabDefault ? `Default: ${Math.round(kabDefault.ch_tahunan_mm ?? 0)}` : "contoh: 2000"}
-            type="number"
-            filled={fieldFilled(ch)}
-          />
-          <Field
-            label="Suhu Rata-rata (°C)"
-            value={suhu}
-            onChange={setSuhu}
-            placeholder={kabDefault ? `Default: ${kabDefault.suhu_mean ?? "-"}` : "contoh: 27"}
-            type="number"
-            step="0.1"
-            filled={fieldFilled(suhu)}
-          />
-          <Field
-            label="Elevasi (mdpl)"
-            value={elevasi}
-            onChange={setElevasi}
-            placeholder={kabDefault ? `Default: ${kabDefault.dem ?? "-"}` : "contoh: 250"}
-            type="number"
-            filled={fieldFilled(elevasi)}
-          />
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Tekstur Tanah {fieldFilled(tekstur) ? "" : kabDefault ? `(Default: ${kabDefault.tekstur_eng ?? "-"})` : ""}
-            </label>
-            <select
-              value={tekstur}
-              onChange={(e) => setTekstur(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2"
-            >
-              <option value="">-- Pakai default --</option>
-              {TEKSTUR_OPTIONS.map((t) => (
-                <option key={t.value} value={t.value}>
-                  {t.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <button
-          type="submit"
-          className="bg-green-700 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-green-800"
-        >
-          Cek Kesesuaian
-        </button>
-      </form>
-
-      {submitted && (
-        <section>
-          <h2 className="text-lg font-semibold text-green-900 mb-2">Indikator yang dipakai</h2>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6 text-sm">
-            <IndikatorChip label="pH" value={indikatorFinal.ph} fromInput={fieldFilled(ph)} />
-            <IndikatorChip label="Curah Hujan" value={indikatorFinal.ch_tahunan_mm} unit="mm/thn" fromInput={fieldFilled(ch)} />
-            <IndikatorChip label="Suhu" value={indikatorFinal.suhu_c} unit="°C" fromInput={fieldFilled(suhu)} />
-            <IndikatorChip label="Elevasi" value={indikatorFinal.elevasi_m} unit="mdpl" fromInput={fieldFilled(elevasi)} />
-            <IndikatorChip label="Tekstur" value={indikatorFinal.tekstur} fromInput={fieldFilled(tekstur)} />
-          </div>
-
-          <h2 className="text-lg font-semibold text-green-900 mb-3">Hasil Klasifikasi</h2>
-          {hasil.length === 0 ? (
-            <p className="text-gray-400">
-              Belum ada indikator yang cukup untuk diklasifikasikan. Isi minimal 1 indikator atau
-              pilih kabupaten dulu.
-            </p>
-          ) : (
-            <div className="grid md:grid-cols-2 gap-3">
-              {hasil.map((h) => (
-                <div key={h.nama_komoditas} className="bg-white rounded-lg border border-gray-100 p-3">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="font-medium text-sm">{h.nama_komoditas}</span>
-                    <Badge text={h.kelas} color={KELAS_LABEL[h.kelas]?.color} />
-                  </div>
-                  {h.limiting_factors.length > 0 && (
-                    <p className="text-xs text-gray-500">{h.limiting_factors.join("; ")}</p>
-                  )}
-                </div>
-              ))}
+        {/* TOP BAR */}
+        <header className="bg-white border-b border-[#166534]/10">
+          <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-[#166534] flex items-center justify-center text-white text-[15px]">🌱</div>
+              <span className="font-extrabold text-[16px] tracking-tight text-[#166534]">TaniRekom</span>
             </div>
-          )}
+            <Link href="/" className="flex items-center gap-1.5 text-[13.5px] font-semibold text-[#3c5547] hover:text-[#166534] transition">
+              ← Kembali
+            </Link>
+          </div>
+        </header>
+
+        {/* HEADER */}
+        <section className="grain border-b border-[#166534]/10">
+          <div className="max-w-6xl mx-auto px-6 py-8">
+            <span className="inline-flex items-center gap-2 text-[12.5px] font-semibold text-[#166534] bg-[#22c55e]/12 border border-[#166534]/15 px-3 py-1 rounded-full mb-4">
+              🧭 Mode manual
+            </span>
+            <h1 className="text-[32px] font-extrabold tracking-tight text-[#143d27] leading-tight">
+              Cek Kesesuaian Lahan Manual
+            </h1>
+            <p className="text-[15px] text-[#46604f] mt-2.5 max-w-2xl">
+              Pilih kabupaten untuk mengisi data otomatis, lalu sesuaikan parameter sesuai kondisi lahanmu sendiri. Hasil klasifikasi diperbarui otomatis.
+            </p>
+          </div>
         </section>
-      )}
-    </Layout>
-  );
-}
 
-function Field({ label, value, onChange, placeholder, type, step, filled }) {
-  return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-      <input
-        type={type}
-        step={step}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className={`w-full border rounded-lg px-3 py-2 ${
-          filled ? "border-green-400 bg-green-50" : "border-gray-300"
-        }`}
-      />
-    </div>
-  );
-}
+        {/* BODY */}
+        <div className="max-w-6xl mx-auto px-6 py-8 grid lg:grid-cols-[380px_1fr] gap-6 items-start">
 
-function IndikatorChip({ label, value, unit, fromInput }) {
-  return (
-    <div className={`rounded-lg p-2 border ${fromInput ? "border-green-300 bg-green-50" : "border-gray-200 bg-gray-50"}`}>
-      <div className="text-gray-500">{label}</div>
-      <div className="font-medium">
-        {value ?? "-"} {unit || ""}
+          {/* FORM */}
+          <div className="bg-white rounded-2xl border border-[#166534]/10 p-6 lg:sticky lg:top-6">
+            <h2 className="text-[16px] font-extrabold text-[#143d27] mb-1">Parameter Lahan</h2>
+            <p className="text-[12.5px] text-[#8a9e92] mb-5">Field berwarna hijau = diisi manual.</p>
+
+            <label className="block mb-4">
+              <span className="block text-[12.5px] font-semibold text-[#3c5547] mb-1.5">Kabupaten</span>
+              <select
+                value={kodeKab}
+                onChange={(e) => setKodeKab(e.target.value)}
+                className="w-full bg-[#faf7f0] border border-[#166534]/15 rounded-xl px-3.5 py-2.5 text-[14px] font-medium text-[#1a2e22] outline-none focus:border-[#166534]/45 transition cursor-pointer"
+              >
+                <option value="">— Pilih kabupaten —</option>
+                {kabupatenList.map((k) => (
+                  <option key={k.kode_kab} value={k.kode_kab}>
+                    {k.nama_kab} ({k.provinsi})
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <div className="grid grid-cols-2 gap-3">
+              <InputField
+                label="pH Tanah" type="number" step="0.1"
+                value={ph} onChange={setPh} manual={m.ph}
+                placeholder={kabDefault ? `${kabDefault.ph ?? "—"}` : "cth: 6.2"}
+              />
+              <InputField
+                label="Curah Hujan" unit="mm/thn" type="number"
+                value={ch} onChange={setCh} manual={m.ch}
+                placeholder={kabDefault ? `${Math.round(kabDefault.ch_tahunan_mm ?? 0)}` : "cth: 2000"}
+              />
+              <InputField
+                label="Suhu" unit="°C" type="number" step="0.1"
+                value={suhu} onChange={setSuhu} manual={m.suhu}
+                placeholder={kabDefault ? `${kabDefault.suhu_mean ?? "—"}` : "cth: 27"}
+              />
+              <InputField
+                label="Elevasi" unit="mdpl" type="number"
+                value={elevasi} onChange={setElevasi} manual={m.elevasi}
+                placeholder={kabDefault ? `${kabDefault.dem ?? "—"}` : "cth: 250"}
+              />
+            </div>
+
+            <label className="block mt-3">
+              <span className="block text-[12.5px] font-semibold text-[#3c5547] mb-1.5">Tekstur Tanah</span>
+              <select
+                value={tekstur}
+                onChange={(e) => setTekstur(e.target.value)}
+                className={`w-full rounded-xl px-3.5 py-2.5 text-[14px] font-semibold text-[#1a2e22] outline-none transition cursor-pointer ${
+                  m.tekstur
+                    ? "bg-[#16a34a]/6 border-2 border-[#16a34a]/45 focus:border-[#16a34a]"
+                    : "bg-[#faf7f0] border border-[#166534]/15 focus:border-[#166534]/40"
+                }`}
+              >
+                <option value="">— Pakai default{kabDefault && !m.tekstur ? ` (${kabDefault.tekstur_eng ?? "—"})` : ""} —</option>
+                {TEKSTUR_OPTIONS.map((t) => (
+                  <option key={t.value} value={t.value}>{t.label}</option>
+                ))}
+              </select>
+              <span className={`block text-[10.5px] font-semibold mt-1 ${m.tekstur ? "text-[#15803d]" : "text-[#a7bbae]"}`}>
+                {m.tekstur ? "● diisi manual" : "default kabupaten"}
+              </span>
+            </label>
+
+            <button
+              type="button"
+              onClick={handleReset}
+              className="w-full mt-6 text-[13px] font-semibold text-[#166534] border border-[#166534]/20 rounded-xl py-2.5 hover:bg-[#166534]/5 transition"
+            >
+              ↺ Reset ke default kabupaten
+            </button>
+          </div>
+
+          {/* RESULTS */}
+          <div>
+            {hasAnyData ? (
+              <>
+                {/* CHIPS */}
+                <div className="mb-6">
+                  <h2 className="text-[15px] font-extrabold text-[#143d27] mb-3">Indikator yang Digunakan</h2>
+                  <div className="flex flex-wrap gap-2.5">
+                    <Chip icon="🧪" label="pH Tanah"
+                      value={indikatorFinal.ph != null ? String(indikatorFinal.ph) : null}
+                      manual={m.ph} />
+                    <Chip icon="🌧️" label="Curah Hujan"
+                      value={indikatorFinal.ch_tahunan_mm != null ? `${Math.round(indikatorFinal.ch_tahunan_mm)} mm` : null}
+                      manual={m.ch} />
+                    <Chip icon="🌡️" label="Suhu"
+                      value={indikatorFinal.suhu_c != null ? `${indikatorFinal.suhu_c} °C` : null}
+                      manual={m.suhu} />
+                    <Chip icon="⛰️" label="Elevasi"
+                      value={indikatorFinal.elevasi_m != null ? `${indikatorFinal.elevasi_m} mdpl` : null}
+                      manual={m.elevasi} />
+                    <Chip icon="🪨" label="Tekstur"
+                      value={indikatorFinal.tekstur}
+                      manual={m.tekstur} />
+                  </div>
+                </div>
+
+                {/* CLASSIFICATION GRID */}
+                <h2 className="text-[15px] font-extrabold text-[#143d27] mb-1">Hasil Klasifikasi Komoditas</h2>
+                <div className="flex items-center gap-4 text-[11.5px] font-medium text-[#5a7265] mb-4">
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#16a34a]" />S1 Sangat sesuai
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#eab308]" />S2 Cukup sesuai
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#dc2626]" />N Tidak sesuai
+                  </span>
+                </div>
+
+                {hasil.length === 0 ? (
+                  <p className="text-[14px] text-[#8a9e92]">
+                    Data tidak cukup untuk mengklasifikasikan komoditas.
+                  </p>
+                ) : (
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    {hasil.map((h) => {
+                      const sty = KELAS_STY[h.kelas] || KELAS_STY["N"];
+                      return (
+                        <div key={h.nama_komoditas} className={`bg-white rounded-2xl border p-4 flex items-start gap-3 ${sty.card}`}>
+                          <span className="w-11 h-11 rounded-xl bg-[#166534]/6 flex items-center justify-center text-[20px] shrink-0">
+                            {getEmoji(h.nama_komoditas)}
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-[14.5px] font-bold text-[#1a2e22] truncate">{h.nama_komoditas}</span>
+                              <span className={`shrink-0 text-[12px] font-extrabold px-2.5 py-1 rounded-lg ${sty.badge}`}>
+                                {h.kelas}
+                              </span>
+                            </div>
+                            {h.limiting_factors.length > 0 && (
+                              <div className={`text-[12px] mt-1.5 leading-snug ${sty.lf}`}>
+                                {h.limiting_factors.join(" · ")}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </>
+            ) : (
+              /* Empty state */
+              <div className="flex flex-col items-center justify-center py-20 text-center rounded-2xl border-2 border-dashed border-[#166534]/10">
+                <div className="text-5xl mb-4">🌱</div>
+                <p className="font-extrabold text-[#143d27] mb-1">Pilih kabupaten atau isi indikator</p>
+                <p className="text-[13.5px] text-[#8a9e92]">
+                  Hasil kesesuaian lahan akan muncul otomatis di sini
+                </p>
+              </div>
+            )}
+          </div>
+
+        </div>
       </div>
-      <div className="text-[10px] text-gray-400">{fromInput ? "diisi manual" : "default kabupaten"}</div>
-    </div>
+    </>
   );
 }
 
