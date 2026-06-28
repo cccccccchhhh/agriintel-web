@@ -53,3 +53,38 @@ export function getForecastIklim(kodeKab) {
 export function getStats() {
   return readJSON("stats.json");
 }
+
+export function getAllNamaKomoditas() {
+  return readJSON("lur.json").map((r) => r.nama_komoditas);
+}
+
+export function getKomoditasPageData(namaKomoditas) {
+  const lurList = readJSON("lur.json");
+  const lurRow = lurList.find((r) => r.nama_komoditas === namaKomoditas) || null;
+
+  const komoditasList = readJSON("komoditas.json");
+  const namaDemand = lurRow?.nama_demand?.toLowerCase() ?? "";
+  const trenData =
+    komoditasList.find((k) => k.komoditas.toLowerCase() === namaDemand) ||
+    komoditasList.find((k) => namaDemand.includes(k.komoditas.toLowerCase())) ||
+    null;
+
+  const kabupatenAll = readJSON("kabupaten.json");
+  const kabupatenCocok = kabupatenAll
+    .filter((kab) => {
+      const kls = kab.kelas?.[namaKomoditas];
+      return kls === "S1" || kls === "S2";
+    })
+    .map((kab) => ({
+      kode_kab: kab.kode_kab,
+      nama_kab: kab.nama_kab,
+      provinsi: kab.provinsi,
+      kelas: kab.kelas[namaKomoditas],
+    }))
+    .sort((a, b) => {
+      if (a.kelas === b.kelas) return a.nama_kab.localeCompare(b.nama_kab);
+      return a.kelas === "S1" ? -1 : 1;
+    });
+
+  return { lurRow, trenData, kabupatenCocok };
+}

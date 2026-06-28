@@ -5,10 +5,10 @@ import SearchBar from "../components/SearchBar";
 import StatCard from "../components/StatCard";
 import Badge from "../components/Badge";
 import Link from "next/link";
-import { getKabupatenList, getKomoditasList, getStats } from "../lib/data";
+import { getKabupatenList, getKomoditasList, getStats, getAllNamaKomoditas } from "../lib/data";
 import { TREN_LABEL } from "../lib/constants";
 
-export default function Home({ kabupatenList, komoditasList, stats }) {
+export default function Home({ kabupatenList, komoditasList, stats, namaKomoditasMap }) {
   const sortedKomoditas = [...komoditasList].sort((a, b) => b.slope - a.slope);
 
   return (
@@ -66,7 +66,18 @@ export default function Home({ kabupatenList, komoditasList, stats }) {
             <tbody>
               {sortedKomoditas.map((k) => (
                 <tr key={k.komoditas} className="border-t border-gray-100">
-                  <td className="px-4 py-2 font-medium">{k.komoditas}</td>
+                  <td className="px-4 py-2 font-medium">
+                    {namaKomoditasMap[k.komoditas] ? (
+                      <Link
+                        href={`/komoditas/${encodeURIComponent(namaKomoditasMap[k.komoditas])}`}
+                        className="text-green-700 hover:underline"
+                      >
+                        {k.komoditas}
+                      </Link>
+                    ) : (
+                      k.komoditas
+                    )}
+                  </td>
                   <td className="px-4 py-2">
                     <Badge text={TREN_LABEL[k.tren]?.label || k.tren} color={TREN_LABEL[k.tren]?.color || "#6b7280"} />
                   </td>
@@ -93,11 +104,26 @@ export default function Home({ kabupatenList, komoditasList, stats }) {
 }
 
 export async function getStaticProps() {
+  const komoditasList = getKomoditasList();
+  const namaKomoditasLur = getAllNamaKomoditas();
+
+  // Map komoditas demand name → lur nama_komoditas (for URL slugs)
+  // Match by lowercased demand name inclusion
+  const namaKomoditasMap = {};
+  for (const k of komoditasList) {
+    const lower = k.komoditas.toLowerCase();
+    const match = namaKomoditasLur.find(
+      (nama) => nama.toLowerCase() === lower || lower.includes(nama.toLowerCase())
+    );
+    if (match) namaKomoditasMap[k.komoditas] = match;
+  }
+
   return {
     props: {
       kabupatenList: getKabupatenList(),
-      komoditasList: getKomoditasList(),
+      komoditasList,
       stats: getStats(),
+      namaKomoditasMap,
     },
   };
 }
