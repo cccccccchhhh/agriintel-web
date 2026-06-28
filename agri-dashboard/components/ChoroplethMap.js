@@ -1,5 +1,5 @@
 // components/ChoroplethMap.js — client-only, loaded via next/dynamic
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useMemo, useRef } from "react";
 import { ComposableMap, Geographies, Geography } from "react-simple-maps";
 import { useRouter } from "next/router";
 
@@ -73,10 +73,9 @@ export default function ChoroplethMap({ kabupatenData }) {
   const [tooltip, setTooltip] = useState(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
   const [hoveredWADMKK, setHoveredWADMKK] = useState(null);
-  const containerRef = useRef(null);
 
-  // Build lookup: GeoJSON WADMKK (uppercase) → { kode_kab, n_komoditas_cocok, nama_kab, provinsi }
-  const lookup = useCallback(() => {
+  // Build lookup: GeoJSON WADMKK (uppercase) → { kode_kab, n, nama, provinsi }
+  const kabMap = useMemo(() => {
     const map = {};
     for (const kab of kabupatenData) {
       const key = (ALIAS[kab.nama_kab] ?? kab.nama_kab).toUpperCase().trim();
@@ -90,34 +89,40 @@ export default function ChoroplethMap({ kabupatenData }) {
     return map;
   }, [kabupatenData]);
 
-  const kabMap = lookup();
-  const maxN = Math.max(...kabupatenData.map((k) => k.n_komoditas_cocok ?? 0));
+  const maxN = useMemo(
+    () => Math.max(...kabupatenData.map((k) => k.n_komoditas_cocok ?? 0)),
+    [kabupatenData]
+  );
 
   function resolve(props) {
     const key = (props.WADMKK ?? "").toUpperCase().trim();
     return kabMap[key] ?? null;
   }
 
-  function handleMouseMove(e) {
-    setTooltipPos({ x: e.clientX, y: e.clientY });
-  }
-
   return (
     <div
-      ref={containerRef}
-      className="relative w-full bg-sky-50 rounded-xl overflow-hidden border border-gray-200"
-      onMouseMove={handleMouseMove}
+      className="relative w-full rounded-xl overflow-hidden border border-gray-200"
+      onMouseMove={(e) => setTooltipPos({ x: e.clientX, y: e.clientY })}
     >
       <ComposableMap
         projection="geoMercator"
-        projectionConfig={{ center: [118, -2], scale: 1050 }}
+        projectionConfig={{
+          // Indonesia bounding box: lon 95°–141°, lat -11°–6°, center ≈ [118, -2.5]
+          // scale=950 fits ~46° lon span into ~760px of the 800 viewBox
+          rotate: [-118, 0, 0],
+          center: [0, -2],
+          scale: 950,
+        }}
         width={800}
-        height={420}
-        style={{ width: "100%", height: "auto" }}
+        height={400}
+        style={{ width: "100%", height: "auto", background: "#e0f2fe" }}
       >
         <Geographies geography={GEO_URL}>
           {({ geographies }) =>
             geographies.map((geo) => {
+              // Skip features without geometry
+              if (!geo.geometry) return null;
+
               const props = geo.properties;
               const wadmkk = (props.WADMKK ?? "").toUpperCase().trim();
               const data = resolve(props);
@@ -130,7 +135,7 @@ export default function ChoroplethMap({ kabupatenData }) {
                   geography={geo}
                   fill={fill}
                   stroke="#fff"
-                  strokeWidth={0.3}
+                  strokeWidth={0.4}
                   style={{
                     default: { outline: "none" },
                     hover: { outline: "none" },
@@ -159,15 +164,16 @@ export default function ChoroplethMap({ kabupatenData }) {
         </Geographies>
       </ComposableMap>
 
+      {/* Tooltip */}
+      <Tooltip content={tooltip} pos={tooltipPos} />
+
       {/* Legend */}
       <div className="absolute bottom-3 left-3 bg-white/90 rounded-lg px-3 py-2 text-xs shadow">
         <div className="font-semibold text-gray-600 mb-1">Jumlah Komoditas Cocok</div>
         <div className="flex items-center gap-2">
           <div
             className="h-3 w-28 rounded"
-            style={{
-              background: `linear-gradient(to right, ${COLOR_MIN}, ${COLOR_MAX})`,
-            }}
+            style={{ background: `linear-gradient(to right, ${COLOR_MIN}, ${COLOR_MAX})` }}
           />
           <span className="text-gray-500">0 → {maxN}</span>
         </div>
