@@ -5,21 +5,11 @@ import SearchBar from "../components/SearchBar";
 import StatCard from "../components/StatCard";
 import Badge from "../components/Badge";
 import Link from "next/link";
-import dynamic from "next/dynamic";
 import { useState, useMemo } from "react";
-import { getKabupatenList, getKomoditasList, getStats, getAllNamaKomoditas, getAllRekomendasi, getAllKabupaten } from "../lib/data";
+import { getKabupatenList, getKomoditasList, getStats, getAllNamaKomoditas, getAllRekomendasi } from "../lib/data";
 import { TREN_LABEL } from "../lib/constants";
 
-const ChoroplethMap = dynamic(() => import("../components/ChoroplethMap"), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-64 bg-sky-50 rounded-xl border border-gray-200 flex items-center justify-center text-gray-400 text-sm">
-      Memuat peta…
-    </div>
-  ),
-});
-
-export default function Home({ kabupatenList, komoditasList, stats, namaKomoditasMap, kabupatenData }) {
+export default function Home({ kabupatenList, komoditasList, stats, namaKomoditasMap }) {
   const [provinsi, setProvinsi] = useState("");
   const sortedKomoditas = [...komoditasList].sort((a, b) => b.slope - a.slope);
 
@@ -99,16 +89,6 @@ export default function Home({ kabupatenList, komoditasList, stats, namaKomodita
           color="#ca8a04"
         />
         <StatCard label="Komoditas Dianalisis" value={displayStats.n_komoditas} color="#0369a1" />
-      </section>
-
-      <section className="my-10">
-        <h2 className="text-xl font-semibold mb-3 text-green-900">
-          Peta Kesesuaian Lahan per Kabupaten
-        </h2>
-        <p className="text-sm text-gray-500 mb-3">
-          Warna menunjukkan jumlah komoditas yang cocok ditanam (S1/S2). Klik kabupaten untuk melihat detail.
-        </p>
-        <ChoroplethMap kabupatenData={kabupatenData} />
       </section>
 
       <section className="my-10">
@@ -192,16 +172,12 @@ export async function getStaticProps() {
     };
   });
 
-  // Strip kelas field to keep props lean — only need kode, nama, provinsi, n_komoditas_cocok for map
-  const kabupatenData = getAllKabupaten().map(({ kelas, ...rest }) => rest);
-
   return {
     props: {
       kabupatenList,
       komoditasList,
       stats: getStats(),
       namaKomoditasMap,
-      kabupatenData,
     },
   };
 }
