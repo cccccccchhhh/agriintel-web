@@ -18,8 +18,8 @@ export default function Layout({ children }) {
           </Link>
           <nav className="hidden md:flex items-center gap-8 text-[14px] font-medium text-[#3c5547]">
             <Link href="/" className="hover:text-[#166534] transition">Beranda</Link>
-            <Link href="/#komoditas" className="hover:text-[#166534] transition">Komoditas Dashboard</Link>
-            <Link href="/#wilayah" className="hover:text-[#166534] transition">Analisis Wilayah</Link>
+            <Link href="/komoditas" className="hover:text-[#166534] transition">Komoditas Dashboard</Link>
+            <Link href="/ruled-based" className="hover:text-[#166534] transition">Analisis Wilayah</Link>
             <Link href="/compare" className="hover:text-[#166534] transition">Bandingkan Wilayah</Link>
           </nav>
           <div className="hidden sm:block">

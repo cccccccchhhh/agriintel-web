@@ -334,22 +334,37 @@ export default function ComparePage({ kabupatenList, kabupatenMap, rekomendasiMa
 
       {/* Kabupaten Selectors */}
       <div className="grid md:grid-cols-2 gap-6 mb-8 animate-fade-in">
-        <KabupatenSelect
-          label="Kabupaten A"
-          value={kodeA}
-          onChange={setKodeA}
-          kabupatenList={kabupatenList}
-          excludeKode={kodeB}
-          colorTheme="green"
-        />
-        <KabupatenSelect
-          label="Kabupaten B"
-          value={kodeB}
-          onChange={setKodeB}
-          kabupatenList={kabupatenList}
-          excludeKode={kodeA}
-          colorTheme="blue"
-        />
+        <label className="block">
+          <span className="text-[12px] font-bold text-[#6a8174] uppercase tracking-wider mb-2 block">Kabupaten A</span>
+          <select
+            value={kodeA || ""}
+            onChange={(e) => setKodeA(e.target.value || null)}
+            className="w-full rounded-2xl border border-[#166534]/15 bg-white px-4 py-3 text-[14px] font-bold text-[#1a2e22] outline-none transition-all duration-300 focus:border-[#166534]/40 focus:ring-2 focus:ring-[#166534]/10"
+          >
+            <option value="">Pilih kabupaten/kota…</option>
+            {kabupatenList.map((k) => (
+              <option key={k.kode_kab} value={k.kode_kab} disabled={k.kode_kab === kodeB}>
+                {k.nama_kab} ({k.provinsi})
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="block">
+          <span className="text-[12px] font-bold text-[#6a8174] uppercase tracking-wider mb-2 block">Kabupaten B</span>
+          <select
+            value={kodeB || ""}
+            onChange={(e) => setKodeB(e.target.value || null)}
+            className="w-full rounded-2xl border border-[#166534]/15 bg-white px-4 py-3 text-[14px] font-bold text-[#1a2e22] outline-none transition-all duration-300 focus:border-[#166534]/40 focus:ring-2 focus:ring-[#166534]/10"
+          >
+            <option value="">Pilih kabupaten/kota…</option>
+            {kabupatenList.map((k) => (
+              <option key={k.kode_kab} value={k.kode_kab} disabled={k.kode_kab === kodeA}>
+                {k.nama_kab} ({k.provinsi})
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
 
       {!bothSelected ? (
