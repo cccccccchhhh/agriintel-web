@@ -2,20 +2,37 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { useRouter } from "next/router";
 
-const COMMODITIES = [
-  { name: "Padi", icon: "🌾", meta: "Tanaman Pangan", kind: "Komoditas", iconBg: "bg-[#166534]/8 text-[#166534]" },
-  { name: "Jagung", icon: "🌽", meta: "Tanaman Pangan", kind: "Komoditas", iconBg: "bg-[#166534]/8 text-[#166534]" },
-  { name: "Cabai Merah", icon: "🌶️", meta: "Hortikultura", kind: "Komoditas", iconBg: "bg-[#166534]/8 text-[#166534]" },
-  { name: "Bawang Merah", icon: "🧅", meta: "Hortikultura", kind: "Komoditas", iconBg: "bg-[#166534]/8 text-[#166534]" },
-  { name: "Kopi Arabika", icon: "☕", meta: "Perkebunan", kind: "Komoditas", iconBg: "bg-[#166534]/8 text-[#166534]" },
-  { name: "Kedelai", icon: "🫘", meta: "Tanaman Pangan", kind: "Komoditas", iconBg: "bg-[#166534]/8 text-[#166534]" },
-  { name: "Kakao", icon: "🍫", meta: "Perkebunan", kind: "Komoditas", iconBg: "bg-[#166534]/8 text-[#166534]" },
-  { name: "Tomat", icon: "🍅", meta: "Hortikultura", kind: "Komoditas", iconBg: "bg-[#166534]/8 text-[#166534]" },
-  { name: "Kentang", icon: "🥔", meta: "Hortikultura", kind: "Komoditas", iconBg: "bg-[#166534]/8 text-[#166534]" },
-  { name: "Wortel", icon: "🥕", meta: "Hortikultura", kind: "Komoditas", iconBg: "bg-[#166534]/8 text-[#166534]" },
+const FALLBACK_COMMODITIES = [
+  { name: "Padi", icon: "🌾" },
+  { name: "Jagung", icon: "🌽" },
+  { name: "Cabai Merah", icon: "🌶️" },
+  { name: "Bawang Merah", icon: "🧅" },
+  { name: "Kopi Arabika", icon: "☕" },
+  { name: "Kedelai", icon: "🫘" },
+  { name: "Kakao", icon: "🍫" },
+  { name: "Tomat", icon: "🍅" },
+  { name: "Kentang", icon: "🥔" },
+  { name: "Wortel", icon: "🥕" },
 ];
 
-export default function SearchBar({ kabupatenList, autoFocus = false, showChips = false }) {
+function getCommodityIcon(name) {
+  const lower = name.toLowerCase();
+  if (lower.includes("padi")) return "🌾";
+  if (lower.includes("jagung")) return "🌽";
+  if (lower.includes("cabai") || lower.includes("cabe")) return "🌶️";
+  if (lower.includes("bawang")) return "🧅";
+  if (lower.includes("kopi")) return "☕";
+  if (lower.includes("kedelai")) return "🫘";
+  if (lower.includes("kakao")) return "🍫";
+  if (lower.includes("tomat")) return "🍅";
+  if (lower.includes("kentang")) return "🥔";
+  if (lower.includes("wortel")) return "🥕";
+  if (lower.includes("durian")) return "🍈";
+  if (lower.includes("buah")) return "🍈";
+  return "🌱";
+}
+
+export default function SearchBar({ kabupatenList = [], komoditasList = [], autoFocus = false, showChips = false, mode = "mixed", placeholder }) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const router = useRouter();
@@ -29,11 +46,29 @@ export default function SearchBar({ kabupatenList, autoFocus = false, showChips 
     return () => document.removeEventListener("mousedown", onClickOutside);
   }, []);
 
+  const availableKomoditas = useMemo(() => {
+    if (komoditasList.length) {
+      return komoditasList.map((kom) => ({
+        name: kom.komoditas,
+        icon: getCommodityIcon(kom.komoditas),
+        meta: "Komoditas",
+        kind: "Komoditas",
+        iconBg: "bg-[#166534]/8 text-[#166534]",
+      }));
+    }
+    return FALLBACK_COMMODITIES.map((item) => ({
+      name: item.name,
+      icon: item.icon,
+      meta: "Komoditas",
+      kind: "Komoditas",
+      iconBg: "bg-[#166534]/8 text-[#166534]",
+    }));
+  }, [komoditasList]);
+
   const suggestions = useMemo(() => {
     if (!query.trim()) return [];
     const q = query.toLowerCase();
 
-    const matchedComms = COMMODITIES.filter((c) => c.name.toLowerCase().includes(q));
     const matchedKabs = (kabupatenList || [])
       .filter((k) => k.nama_kab.toLowerCase().includes(q) || (k.provinsi && k.provinsi.toLowerCase().includes(q)))
       .map((k) => ({
@@ -45,15 +80,25 @@ export default function SearchBar({ kabupatenList, autoFocus = false, showChips 
         kode_kab: k.kode_kab,
       }));
 
-    return [...matchedComms, ...matchedKabs].slice(0, 5);
-  }, [query, kabupatenList]);
+    const matchedComms = availableKomoditas.filter((c) => c.name.toLowerCase().includes(q));
+    let items = [];
+    if (mode === "komoditas") {
+      items = matchedComms;
+    } else if (mode === "kabupaten") {
+      items = matchedKabs;
+    } else {
+      items = [...matchedComms, ...matchedKabs];
+    }
+
+    return items.slice(0, 6);
+  }, [query, kabupatenList, availableKomoditas, mode]);
 
   const handlePick = (item) => {
     setQuery(item.name);
     setOpen(false);
     if (item.kind === "Komoditas") {
       router.push(`/komoditas/${encodeURIComponent(item.name)}`);
-    } else {
+    } else if (item.kind === "Wilayah") {
       router.push(`/kabupaten/${item.kode_kab}`);
     }
   };
@@ -64,12 +109,19 @@ export default function SearchBar({ kabupatenList, autoFocus = false, showChips 
     }
   };
 
-  const chips = [
-    { label: "Garut", search: "Garut" },
-    { label: "Padi", search: "Padi" },
-    { label: "Cabai Merah", search: "Cabai Merah" },
-    { label: "Bandung", search: "Bandung" },
-  ];
+  const chips = useMemo(() => {
+    if (mode === "komoditas") {
+      return availableKomoditas.slice(0, 4).map((item) => ({ label: item.name, search: item.name }));
+    }
+    return [
+      { label: "Garut", search: "Garut" },
+      { label: "Bandung", search: "Bandung" },
+      { label: "Malang", search: "Malang" },
+      { label: "Yogyakarta", search: "Yogyakarta" },
+    ];
+  }, [mode, availableKomoditas]);
+
+  const finalPlaceholder = placeholder || (mode === "komoditas" ? "Cari komoditas, mis. Bayam…" : "Cari kabupaten/kota, mis. Garut…");
 
   return (
     <div ref={boxRef} className="relative w-full max-w-xl mx-auto text-left z-30">
@@ -83,7 +135,7 @@ export default function SearchBar({ kabupatenList, autoFocus = false, showChips 
             setOpen(true);
           }}
           onFocus={() => setOpen(true)}
-          placeholder="Cari kabupaten atau komoditas, mis. Garut, Padi…"
+          placeholder={finalPlaceholder}
           className="flex-1 bg-transparent outline-none text-[15px] py-1.5 placeholder:text-[#a7bbae] text-[#1a2e22] font-medium"
         />
         <button
@@ -117,7 +169,7 @@ export default function SearchBar({ kabupatenList, autoFocus = false, showChips 
           ) : (
             <div className="px-5 py-4 text-center text-gray-400 text-sm">
               <span className="block text-2xl mb-1">🍃</span>
-              Tidak ditemukan kabupaten atau komoditas.
+              Tidak ditemukan.
             </div>
           )}
         </div>

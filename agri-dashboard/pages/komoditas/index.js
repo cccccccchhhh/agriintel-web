@@ -1,6 +1,7 @@
 import Head from "next/head";
 import Link from "next/link";
 import Layout from "../../components/Layout";
+import SearchBar from "../../components/SearchBar";
 import Badge from "../../components/Badge";
 import StatCard from "../../components/StatCard";
 import ForecastChart from "../../components/ForecastChart";
@@ -45,6 +46,14 @@ export default function KomoditasDashboard({ komoditasList, trenGroups }) {
         <p className="text-[14.5px] text-[#46604f] mt-3 max-w-2xl font-medium leading-relaxed">
           Gunakan dashboard ini untuk menilai komoditas dengan permintaan naik, turun, atau stabil, lalu buka halaman detailnya untuk rekomendasi wilayah dan syarat tumbuh.
         </p>
+        <div className="mt-8 max-w-xl mx-auto">
+          <SearchBar
+            komoditasList={komoditasList}
+            mode="komoditas"
+            placeholder="Cari komoditas, mis. Bayam…"
+            showChips={false}
+          />
+        </div>
       </section>
 
       <section className="grid gap-4 lg:grid-cols-[280px_1fr] mb-10">

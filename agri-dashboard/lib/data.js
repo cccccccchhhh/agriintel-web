@@ -55,16 +55,20 @@ export function getStats() {
 }
 
 export function getAllNamaKomoditas() {
-  return readJSON("lur.json").map((r) => r.nama_komoditas);
+  return Array.from(new Set(readJSON("komoditas.json").map((r) => r.komoditas)));
 }
 
 export function getKomoditasPageData(namaKomoditas) {
   const lurList = readJSON("lur.json");
-  const lurRow = lurList.find((r) => r.nama_komoditas === namaKomoditas) || null;
-
   const komoditasList = readJSON("komoditas.json");
+  const lowerName = namaKomoditas.toLowerCase();
+
+  const lurRow = lurList.find((r) => r.nama_komoditas.toLowerCase() === lowerName) || null;
+
+  const exactKomoditas = komoditasList.find((k) => k.komoditas.toLowerCase() === lowerName) || null;
   const namaDemand = lurRow?.nama_demand?.toLowerCase() ?? "";
   const trenData =
+    exactKomoditas ||
     komoditasList.find((k) => k.komoditas.toLowerCase() === namaDemand) ||
     komoditasList.find((k) => namaDemand.includes(k.komoditas.toLowerCase())) ||
     null;

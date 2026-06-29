@@ -76,7 +76,13 @@ export default function Home({ kabupatenList, komoditasList, stats }) {
               ))}
             </select>
             <div className="flex-1">
-              <SearchBar kabupatenList={filteredKabupaten} autoFocus showChips={true} />
+              <SearchBar
+                kabupatenList={filteredKabupaten}
+                autoFocus
+                showChips={true}
+                mode="kabupaten"
+                placeholder="Cari kabupaten/kota, mis. Garut…"
+              />
             </div>
           </div>
           {provinsi && (
