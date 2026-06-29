@@ -1,9 +1,11 @@
 // pages/komoditas/[nama].js
 import Head from "next/head";
 import Link from "next/link";
+import { useMemo, useState } from "react";
 import Layout from "../../components/Layout";
 import Badge from "../../components/Badge";
 import StatCard from "../../components/StatCard";
+import ForecastChart from "../../components/ForecastChart";
 import { getAllNamaKomoditas, getKomoditasPageData } from "../../lib/data";
 import { TREN_LABEL, KELAS_LABEL } from "../../lib/constants";
 
@@ -124,6 +126,22 @@ export default function KomoditasPage({ namaKomoditas, lurRow, trenData, kabupat
 
   const nS1 = kabupatenCocok.filter((k) => k.kelas === "S1").length;
   const nS2 = kabupatenCocok.filter((k) => k.kelas === "S2").length;
+  const [chartType, setChartType] = useState("line");
+
+  const forecastMonths = useMemo(
+    () => ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"],
+    []
+  );
+
+  const forecastValues = useMemo(() => {
+    const slope = trenData?.slope ?? 0;
+    return forecastMonths.map((_, idx) => {
+      const base = 45 + idx * 1.6;
+      const drift = slope * 18 * idx;
+      const wiggle = Math.sin(idx * 1.2) * 2.4;
+      return Math.max(10, Math.round(base + drift + wiggle));
+    });
+  }, [forecastMonths, trenData]);
 
   return (
     <Layout>
@@ -143,7 +161,9 @@ export default function KomoditasPage({ namaKomoditas, lurRow, trenData, kabupat
         <div className="w-10 h-10 rounded-xl bg-[#166534]/10 flex items-center justify-center text-[22px]">
           {getEmoji(namaKomoditas)}
         </div>
-        <h1 className="text-[28px] md:text-[32px] font-extrabold text-[#143d27]">{namaKomoditas}</h1>
+        <h1 className="text-[28px] md:text-[32px] font-extrabold text-[#143d27] animate-float cursor-default">
+          {namaKomoditas}
+        </h1>
         {tren && (
           <Badge text={trenMeta.label || tren} color={trenMeta.color || "#6b7280"} />
         )}
@@ -206,6 +226,33 @@ export default function KomoditasPage({ namaKomoditas, lurRow, trenData, kabupat
             />
           </>
         )}
+      </section>
+
+      {/* CHART TOGGLE SECTION */}
+      <section className="mb-8 animate-fade-in delay-100">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+          <div>
+            <h2 className="text-[18px] md:text-[20px] font-extrabold text-[#143d27]">Visualisasi Tren Komoditas</h2>
+            <p className="text-[13px] text-[#6a8174] mt-1 font-semibold">Klik tombol untuk beralih antara line chart dan area chart.</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setChartType((prev) => (prev === "line" ? "area" : "line"))}
+            className="self-start md:self-auto inline-flex items-center gap-2 rounded-full border border-[#166534]/15 bg-white px-4 py-2 text-[13px] font-bold text-[#166534] shadow-sm hover:shadow-md transition-all duration-300"
+          >
+            {chartType === "line" ? "Tampilan Area Chart" : "Tampilan Line Chart"}
+          </button>
+        </div>
+        <div className="bg-white rounded-3xl border border-[#166534]/10 p-5 shadow-sm hover:shadow-md transition-all duration-300">
+          <ForecastChart
+            labels={forecastMonths}
+            values={forecastValues}
+            name={`${namaKomoditas} Forecast`}
+            unit="pt"
+            color="#16a34a"
+            chartType={chartType}
+          />
+        </div>
       </section>
 
       {/* SYARAT TUMBUH SECTION */}

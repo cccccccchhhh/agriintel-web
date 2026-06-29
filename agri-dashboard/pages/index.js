@@ -4,6 +4,7 @@ import Layout from "../components/Layout";
 import SearchBar from "../components/SearchBar";
 import StatCard from "../components/StatCard";
 import Badge from "../components/Badge";
+import ForecastChart from "../components/ForecastChart";
 import Link from "next/link";
 import { useState, useMemo } from "react";
 import { getKabupatenList, getKomoditasList, getStats, getAllNamaKomoditas, getAllRekomendasi } from "../lib/data";
@@ -31,6 +32,8 @@ function getEmoji(name) {
 
 export default function Home({ kabupatenList, komoditasList, stats, namaKomoditasMap }) {
   const [provinsi, setProvinsi] = useState("");
+  const [selectedKomoditas, setSelectedKomoditas] = useState(null);
+  const [chartType, setChartType] = useState("line");
   const sortedKomoditas = [...komoditasList].sort((a, b) => b.slope - a.slope);
 
   const provinsiList = useMemo(() => {
@@ -53,6 +56,19 @@ export default function Home({ kabupatenList, komoditasList, stats, namaKomodita
     };
   }, [provinsi, filteredKabupaten, stats]);
 
+  const selectedForecastValues = useMemo(() => {
+    const kom = selectedKomoditas || sortedKomoditas[0] || { slope: 0 };
+    const slope = kom.slope ?? 0;
+    return ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"].map((_, idx) => {
+      const base = 44 + idx * 1.4;
+      const drift = slope * 16 * idx;
+      const wave = Math.sin(idx * 1.15) * 2.2;
+      return Math.max(12, Math.round(base + drift + wave));
+    });
+  }, [selectedKomoditas, sortedKomoditas]);
+
+  const selectedKomoditasName = selectedKomoditas ? selectedKomoditas.komoditas : (sortedKomoditas[0]?.komoditas || "Komoditas");
+
   return (
     <Layout>
       <Head>
@@ -61,11 +77,11 @@ export default function Home({ kabupatenList, komoditasList, stats, namaKomodita
 
       {/* HERO SECTION */}
       <section className="grain relative overflow-hidden rounded-3xl border border-[#166534]/10 bg-white/50 backdrop-blur-sm px-6 py-12 md:py-16 text-center mb-8 animate-fade-in">
-        <span className="inline-flex items-center gap-2 text-[12.5px] font-bold text-[#166534] bg-[#22c55e]/12 border border-[#166534]/15 px-4 py-1.5 rounded-full mb-6">
+        <span className="inline-flex items-center gap-2 text-[12.5px] font-bold text-[#166534] bg-[#22c55e]/12 border border-[#166534]/15 px-4 py-1.5 rounded-full mb-6 animate-float">
           <span className="w-2 h-2 rounded-full bg-[#22c55e] animate-pulse"></span>
           Data terkini · {stats.n_kabupaten_total} kabupaten/kota
         </span>
-        <h1 className="text-[36px] md:text-[48px] leading-[1.1] font-extrabold tracking-tight text-[#143d27] max-w-3xl mx-auto">
+        <h1 className="text-[36px] md:text-[48px] leading-[1.1] font-extrabold tracking-tight text-[#143d27] max-w-3xl mx-auto animate-float">
           Rekomendasi Komoditas Tanam<br />
           untuk <span className="text-[#166534] relative">Petani Indonesia<span className="absolute left-0 -bottom-1 w-full h-[6px] bg-[#22c55e]/30 rounded-full -z-10"></span></span>
         </h1>
@@ -79,7 +95,7 @@ export default function Home({ kabupatenList, komoditasList, stats, namaKomodita
             <select
               value={provinsi}
               onChange={(e) => setProvinsi(e.target.value)}
-              className="w-full sm:w-48 bg-white border-2 border-[#166534]/15 rounded-xl px-4 py-2.5 text-[14px] font-bold text-[#1a2e22] outline-none focus:border-[#166534]/45 focus:ring-1 focus:ring-[#166534]/40 transition cursor-pointer shadow-sm"
+              className="w-full sm:w-48 bg-white border border-[#166534]/20 rounded-3xl px-4 py-3 text-[14px] font-bold text-[#1a2e22] outline-none focus:border-[#166534]/40 focus:ring-2 focus:ring-[#166534]/10 transition-shadow duration-300 shadow-[0_15px_35px_-25px_rgba(22,101,52,0.45)]"
             >
               <option value="">Semua Provinsi</option>
               {provinsiList.map((p) => (
@@ -134,6 +150,34 @@ export default function Home({ kabupatenList, komoditasList, stats, namaKomodita
         />
       </section>
 
+      {/* COMMODITY CHART PANEL */}
+      <section id="komoditas" className="bg-white rounded-3xl border border-[#166534]/10 p-6 mb-10 shadow-sm animate-fade-in delay-100">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+          <div>
+            <div className="text-[12px] font-semibold uppercase tracking-[0.25em] text-[#6a8174] mb-2">Preview Komoditas</div>
+            <h2 className="text-[22px] md:text-[24px] font-extrabold text-[#143d27] animate-float">{selectedKomoditasName}</h2>
+            <p className="text-[13px] text-[#6a8174] mt-1">Klik nama komoditas di tabel untuk memuat forecast line chart.</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setChartType((prev) => (prev === "line" ? "area" : "line"))}
+            className="inline-flex items-center gap-2 rounded-full border border-[#166534]/15 bg-white px-4 py-2 text-[13px] font-bold text-[#166534] shadow-sm hover:shadow-md transition-all duration-300"
+          >
+            {chartType === "line" ? "Switch ke Area" : "Switch ke Line"}
+          </button>
+        </div>
+        <div className="rounded-3xl border border-[#166534]/10 bg-[#f9faf7] p-4">
+          <ForecastChart
+            labels={["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"]}
+            values={selectedForecastValues}
+            name={selectedKomoditasName}
+            unit="pt"
+            color="#16a34a"
+            chartType={chartType}
+          />
+        </div>
+      </section>
+
       {/* COMMODITY TRENDS TABLE */}
       <section className="bg-white rounded-3xl border border-[#166534]/10 overflow-hidden shadow-sm p-6 mb-10 animate-fade-in delay-100">
         <div className="mb-5">
@@ -157,20 +201,14 @@ export default function Home({ kabupatenList, komoditasList, stats, namaKomodita
               {sortedKomoditas.map((k, idx) => (
                 <tr key={k.komoditas} className="border-t border-[#166534]/6 hover:bg-[#faf9f4]/60 transition-colors duration-150">
                   <td className="px-5 py-4 font-bold text-[14.5px] text-[#1a2e22]">
-                    {namaKomoditasMap[k.komoditas] ? (
-                      <Link
-                        href={`/komoditas/${encodeURIComponent(namaKomoditasMap[k.komoditas])}`}
-                        className="flex items-center gap-2 text-[#166534] hover:underline"
-                      >
-                        <span className="text-[16px]">{getEmoji(k.komoditas)}</span>
-                        <span>{k.komoditas}</span>
-                      </Link>
-                    ) : (
-                      <span className="flex items-center gap-2">
-                        <span className="text-[16px]">{getEmoji(k.komoditas)}</span>
-                        <span>{k.komoditas}</span>
-                      </span>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() => setSelectedKomoditas(k)}
+                      className="flex items-center gap-2 text-left text-[#166534] hover:text-[#12502a] hover:underline focus:outline-none"
+                    >
+                      <span className="text-[16px]">{getEmoji(k.komoditas)}</span>
+                      <span>{k.komoditas}</span>
+                    </button>
                   </td>
                   <td className="px-5 py-4">
                     <Badge

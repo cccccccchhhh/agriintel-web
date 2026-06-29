@@ -1,13 +1,7 @@
 // components/Layout.js
 import Link from "next/link";
-import { useRouter } from "next/router";
 
 export default function Layout({ children }) {
-  const router = useRouter();
-
-  const isLinkActive = (path) => {
-    return router.pathname === path;
-  };
 
   return (
     <div className="min-h-screen flex flex-col bg-[#faf7f0] text-[#1a2e22]">
@@ -24,9 +18,9 @@ export default function Layout({ children }) {
           </Link>
           <nav className="hidden md:flex items-center gap-8 text-[14px] font-medium text-[#3c5547]">
             <Link href="/" className="hover:text-[#166534] transition">Beranda</Link>
-            <Link href="/#komoditas" className="hover:text-[#166534] transition">Komoditas</Link>
-            <Link href="/#wilayah" className="hover:text-[#166534] transition">Wilayah</Link>
-            <Link href="/#tentang" className="hover:text-[#166534] transition">Tentang</Link>
+            <Link href="/#komoditas" className="hover:text-[#166534] transition">Komoditas Dashboard</Link>
+            <Link href="/#wilayah" className="hover:text-[#166534] transition">Analisis Wilayah</Link>
+            <Link href="/compare" className="hover:text-[#166534] transition">Bandingkan Wilayah</Link>
           </nav>
           <div className="hidden sm:block">
             <button className="text-[13px] font-semibold px-4 py-2 rounded-xl border border-[#166534]/25 text-[#166534] hover:bg-[#166534] hover:text-white transition-all duration-300">

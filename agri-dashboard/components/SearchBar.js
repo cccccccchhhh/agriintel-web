@@ -96,13 +96,13 @@ export default function SearchBar({ kabupatenList, autoFocus = false, showChips 
       </div>
 
       {open && query.trim() && (
-        <div className="absolute left-0 right-0 mt-2 bg-white rounded-2xl border border-[#166534]/12 shadow-[0_20px_50px_-15px_rgba(22,101,52,0.3)] overflow-hidden z-40 animate-fade-in-up">
+        <div className="absolute left-0 right-0 mt-2 bg-white/95 backdrop-blur-sm rounded-3xl border border-[#166534]/12 shadow-[0_20px_50px_-15px_rgba(22,101,52,0.3)] overflow-hidden z-40 animate-fade-in-up">
           {suggestions.length > 0 ? (
             suggestions.map((s, idx) => (
               <button
                 key={idx}
                 onMouseDown={() => handlePick(s)}
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#f3f8f4] transition text-left border-b border-[#166534]/6 last:border-0"
+                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#f3f8f4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#166534]/25 transition text-left border-b border-[#166534]/6 last:border-0"
               >
                 <span className={`w-9 h-9 rounded-xl flex items-center justify-center text-[15px] ${s.iconBg}`}>
                   {s.icon}

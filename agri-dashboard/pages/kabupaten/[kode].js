@@ -16,6 +16,8 @@ import {
 import { buatSummary } from "../../lib/summary";
 
 export default function KabupatenPage({ kabupatenList, kab, rekom, forecast }) {
+  const forecastChartType = "line";
+
   if (!kab) {
     return (
       <Layout>
@@ -79,7 +81,12 @@ export default function KabupatenPage({ kabupatenList, kab, rekom, forecast }) {
       {/* Section B: Forecast Cuaca */}
       {forecast && (
         <section className="mb-10">
-          <h2 className="text-[18px] md:text-[20px] font-extrabold mb-4 text-[#143d27]">Forecast Cuaca 12 Bulan ke Depan</h2>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+            <div>
+              <h2 className="text-[18px] md:text-[20px] font-extrabold text-[#143d27]">Forecast Cuaca 12 Bulan ke Depan</h2>
+              <p className="text-[13px] text-[#6a8174] mt-1 font-semibold">Visualisasi garis (line chart) memberikan tampilan tren yang lebih jelas dan bersih.</p>
+            </div>
+          </div>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white rounded-3xl border border-[#166534]/10 p-5 shadow-sm hover:shadow-md transition-all duration-300">
               <h3 className="text-[14px] font-extrabold text-[#1a2e22] mb-3">Curah Hujan (mm/bulan)</h3>
@@ -89,6 +96,7 @@ export default function KabupatenPage({ kabupatenList, kab, rekom, forecast }) {
                 name="Curah Hujan"
                 unit="mm"
                 color="#0284c7"
+                chartType="line"
               />
             </div>
             <div className="bg-white rounded-3xl border border-[#166534]/10 p-5 shadow-sm hover:shadow-md transition-all duration-300">
@@ -99,6 +107,7 @@ export default function KabupatenPage({ kabupatenList, kab, rekom, forecast }) {
                 name="Suhu"
                 unit="°C"
                 color="#d97706"
+                chartType="line"
               />
             </div>
           </div>

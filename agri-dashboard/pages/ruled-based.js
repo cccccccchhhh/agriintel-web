@@ -190,10 +190,10 @@ export default function RuledBasedPage({ kabupatenList, kabupatenData, lurList }
               <select
                 value={tekstur}
                 onChange={(e) => setTekstur(e.target.value)}
-                className={`w-full rounded-xl px-3.5 py-2.5 text-[14px] font-bold text-[#1a2e22] outline-none transition-all duration-300 border-2 cursor-pointer ${
+                className={`w-full rounded-xl px-3.5 py-2.5 text-[14px] font-bold text-[#1a2e22] outline-none transition-all duration-300 border-2 cursor-pointer appearance-none ${
                   m.tekstur
-                    ? "bg-[#16a34a]/6 border-[#16a34a]/45 focus:border-[#16a34a]"
-                    : "bg-[#faf7f0] border-transparent focus:border-[#166534]/40"
+                    ? "bg-[#16a34a]/6 border-[#16a34a]/45 focus:border-[#16a34a] focus:ring-2 focus:ring-[#16a34a]/10"
+                    : "bg-[#faf7f0] border-transparent focus:border-[#166534]/40 focus:ring-2 focus:ring-[#166534]/10"
                 }`}
               >
                 <option value="">— Pakai default{kabDefault && !m.tekstur ? ` (${kabDefault.tekstur_eng ?? "—"})` : ""} —</option>
