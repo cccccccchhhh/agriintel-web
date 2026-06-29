@@ -22,35 +22,15 @@ export default function Layout({ children }) {
               AgriRekomendasi
             </span>
           </Link>
-          <nav className="flex items-center gap-6 md:gap-8 text-[14px] font-semibold">
-            <Link
-              href="/"
-              className={`transition-colors duration-200 hover:text-[#166534] ${
-                isLinkActive("/") ? "text-[#166534] relative after:absolute after:bottom-[-20px] after:left-0 after:right-0 after:h-[3px] after:bg-[#166534] after:rounded-full" : "text-[#3c5547]"
-              }`}
-            >
-              Beranda
-            </Link>
-            <Link
-              href="/ruled-based"
-              className={`transition-colors duration-200 hover:text-[#166534] ${
-                isLinkActive("/ruled-based") ? "text-[#166534] relative after:absolute after:bottom-[-20px] after:left-0 after:right-0 after:h-[3px] after:bg-[#166534] after:rounded-full" : "text-[#3c5547]"
-              }`}
-            >
-              Cek Manual
-            </Link>
-            <Link
-              href="/compare"
-              className={`transition-colors duration-200 hover:text-[#166534] ${
-                isLinkActive("/compare") ? "text-[#166534] relative after:absolute after:bottom-[-20px] after:left-0 after:right-0 after:h-[3px] after:bg-[#166534] after:rounded-full" : "text-[#3c5547]"
-              }`}
-            >
-              Bandingkan
-            </Link>
+          <nav className="hidden md:flex items-center gap-8 text-[14px] font-medium text-[#3c5547]">
+            <Link href="/" className="hover:text-[#166534] transition">Beranda</Link>
+            <Link href="/#komoditas" className="hover:text-[#166534] transition">Komoditas</Link>
+            <Link href="/#wilayah" className="hover:text-[#166534] transition">Wilayah</Link>
+            <Link href="/#tentang" className="hover:text-[#166534] transition">Tentang</Link>
           </nav>
           <div className="hidden sm:block">
-            <button className="text-[13px] font-bold px-4 py-2 rounded-xl border border-[#166534]/25 text-[#166534] hover:bg-[#166534] hover:text-white hover:shadow-sm transition-all duration-300">
-              Mitra Petani
+            <button className="text-[13px] font-semibold px-4 py-2 rounded-xl border border-[#166534]/25 text-[#166534] hover:bg-[#166534] hover:text-white transition-all duration-300">
+              Masuk
             </button>
           </div>
         </div>

@@ -102,7 +102,7 @@ export default function Home({ kabupatenList, komoditasList, stats, namaKomodita
       </section>
 
       {/* STAT CARDS SECTION */}
-      <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+      <section id="wilayah" className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
         <StatCard
           label={provinsi ? "Kab/Kota di Provinsi Ini" : "Kabupaten/Kota Dianalisis"}
           value={displayStats.n_kabupaten_total}
@@ -188,6 +188,25 @@ export default function Home({ kabupatenList, komoditasList, stats, namaKomodita
               ))}
             </tbody>
           </table>
+        </div>
+      </section>
+
+      {/* ABOUT SECTION */}
+      <section id="tentang" className="grid gap-6 lg:grid-cols-3 mb-10 animate-fade-in delay-150">
+        <div className="glass-panel rounded-3xl p-6 border border-[#166534]/10 shadow-sm">
+          <div className="w-12 h-12 rounded-2xl bg-[#16a34a]/10 text-[#166534] flex items-center justify-center text-xl mb-4">📊</div>
+          <h3 className="text-[18px] font-extrabold text-[#143d27] mb-2">Data Pertanian Terpercaya</h3>
+          <p className="text-sm text-[#536d5c] leading-relaxed">Analisis iklim, tanah, dan permintaan pasar digabungkan untuk rekomendasi komoditas yang lebih relevan.</p>
+        </div>
+        <div className="glass-panel rounded-3xl p-6 border border-[#166534]/10 shadow-sm">
+          <div className="w-12 h-12 rounded-2xl bg-[#bef264]/10 text-[#166534] flex items-center justify-center text-xl mb-4">🌾</div>
+          <h3 className="text-[18px] font-extrabold text-[#143d27] mb-2">Fokus Wilayah & Komoditas</h3>
+          <p className="text-sm text-[#536d5c] leading-relaxed">Pilih kabupaten atau komoditas untuk melihat rekomendasi dan detail kecocokan secara cepat.</p>
+        </div>
+        <div className="glass-panel rounded-3xl p-6 border border-[#166534]/10 shadow-sm">
+          <div className="w-12 h-12 rounded-2xl bg-[#236a3d]/10 text-[#166534] flex items-center justify-center text-xl mb-4">⚡</div>
+          <h3 className="text-[18px] font-extrabold text-[#143d27] mb-2">Cepat & Mudah Digunakan</h3>
+          <p className="text-sm text-[#536d5c] leading-relaxed">Desain halaman bersih dan intuitif, cocok untuk petani yang ingin keputusan cepat tanpa kompleksitas.</p>
         </div>
       </section>
 
