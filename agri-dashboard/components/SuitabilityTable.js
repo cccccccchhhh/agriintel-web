@@ -42,6 +42,17 @@ const COMMODITY_META = {
   tembakau: { emoji: "🍃", type: "Perkebunan" },
 };
 
+const CANONICAL_MAP = {
+  "Bawang Merah": "Bawang merah",
+  "Bawang Putih": "Bawang putih",
+  "Cabe": "Cabe rawit",
+  "Sawi": "Sawi Putih",
+};
+
+function getCanonicalName(name) {
+  return CANONICAL_MAP[name] || name;
+}
+
 function getCommMeta(name) {
   const lower = name.toLowerCase();
   for (const [k, v] of Object.entries(COMMODITY_META)) {
@@ -52,18 +63,18 @@ function getCommMeta(name) {
 
 const CLS_THEME = {
   S1: {
-    border: "border-[#16a34a]/25 hover:border-[#16a34a]/50 hover:shadow-[0_8px_24px_-12px_rgba(22,163,74,0.24)]",
-    badge: "bg-[#16a34a]/12 text-[#15803d]",
+    border: "border-emerald-500/40 hover:border-[#bef264]",
+    badge: "bg-emerald-500/20 text-[#bef264] font-extrabold border border-emerald-500/40",
     label: "S1"
   },
   S2: {
-    border: "border-[#eab308]/30 hover:border-[#eab308]/60 hover:shadow-[0_8px_24px_-12px_rgba(234,179,8,0.24)]",
-    badge: "bg-[#eab308]/15 text-[#a16207]",
+    border: "border-amber-500/40 hover:border-amber-400",
+    badge: "bg-amber-500/20 text-amber-300 font-extrabold border border-amber-500/40",
     label: "S2"
   },
   N: {
-    border: "border-[#dc2626]/20 hover:border-[#dc2626]/40 hover:shadow-[0_8px_24px_-12px_rgba(220,38,38,0.18)]",
-    badge: "bg-[#dc2626]/10 text-[#b91c1c]",
+    border: "border-rose-500/40 hover:border-rose-400",
+    badge: "bg-rose-500/20 text-rose-300 font-extrabold border border-rose-500/40",
     label: "N"
   }
 };
@@ -80,9 +91,9 @@ export default function SuitabilityTable({ kelas }) {
 
   const getFilterStyle = (f) => {
     if (filter === f) {
-      return "bg-[#166534] text-white shadow-sm";
+      return "bg-gradient-to-r from-[#22c55e] to-[#15803d] text-white font-black shadow-md border border-[#bef264]/40";
     }
-    return "bg-white border border-[#166534]/15 text-[#3c5547] hover:border-[#166534]/35 hover:bg-[#f3f8f4]";
+    return "glass-card text-emerald-100/70 border-white/10 hover:border-white/20 hover:text-white";
   };
 
   return (
@@ -112,19 +123,19 @@ export default function SuitabilityTable({ kelas }) {
             return (
               <Link
                 key={kom}
-                href={`/komoditas/${encodeURIComponent(kom)}`}
-                className={`bg-white rounded-3xl border p-4 flex items-center justify-between gap-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer ${style.border} animate-fade-in-up`}
+                href={`/komoditas/${encodeURIComponent(getCanonicalName(kom))}`}
+                className={`glass-card rounded-3xl p-4 flex items-center justify-between gap-3 transition-all duration-300 hover:-translate-y-1 cursor-pointer ${style.border} animate-fade-in-up`}
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <span className="w-11 h-11 rounded-2xl bg-[#166534]/6 flex items-center justify-center text-[18px] shrink-0">
+                  <span className="w-11 h-11 rounded-2xl bg-[#22c55e]/15 flex items-center justify-center text-[18px] shrink-0 border border-[#22c55e]/20">
                     {meta.emoji}
                   </span>
                   <div className="min-w-0">
-                    <div className="text-[14px] font-extrabold text-[#1a2e22] truncate">{kom}</div>
-                    <div className="text-[11.5px] text-[#8a9e92] font-semibold">{meta.type}</div>
+                    <div className="text-[14px] font-extrabold text-white truncate">{kom}</div>
+                    <div className="text-[11.5px] text-emerald-200/60 font-bold">{meta.type}</div>
                   </div>
                 </div>
-                <span className={`shrink-0 rounded-2xl px-3 py-2 text-[13px] font-extrabold ${style.badge}`}>
+                <span className={`shrink-0 rounded-2xl px-3 py-1.5 text-[12px] ${style.badge}`}>
                   {style.label}
                 </span>
               </Link>
@@ -132,8 +143,8 @@ export default function SuitabilityTable({ kelas }) {
           })}
         </div>
       ) : (
-        <div className="text-center py-10 bg-white rounded-3xl border border-dashed border-[#166534]/15 animate-fade-in-up">
-          <p className="text-sm text-gray-500 font-semibold">Tidak ada komoditas pada kategori ini.</p>
+        <div className="text-center py-10 glass-panel rounded-3xl border border-dashed border-white/15 animate-fade-in-up">
+          <p className="text-sm text-emerald-200/50 font-semibold">Tidak ada komoditas pada kategori ini.</p>
         </div>
       )}
     </div>

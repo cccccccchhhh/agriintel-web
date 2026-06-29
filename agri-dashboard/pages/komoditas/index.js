@@ -12,14 +12,14 @@ import { TREN_LABEL } from "../../lib/constants";
 export default function KomoditasDashboard({ komoditasList, trenGroups }) {
   const [activeTrend, setActiveTrend] = useState("naik_signifikan");
   const trends = [
-    { key: "naik_signifikan", label: "Naik Signifikan", description: "Permintaan naik kuat", tone: "bg-[#dcfce7]", accent: "text-[#15803d]" },
-    { key: "naik_lemah", label: "Naik Lemah", description: "Permintaan naik perlahan", tone: "bg-[#fef9c3]", accent: "text-[#a16207]" },
-    { key: "turun_lemah", label: "Turun Lemah", description: "Permintaan turun ringan", tone: "bg-[#ffedd5]", accent: "text-[#c2410c]" },
-    { key: "turun_signifikan", label: "Turun Signifikan", description: "Permintaan turun cepat", tone: "bg-[#fee2e2]", accent: "text-[#b91c1c]" },
+    { key: "naik_signifikan", label: "Naik Signifikan", description: "Permintaan naik kuat", tone: "bg-emerald-950/60 border-emerald-500/40", accent: "text-[#bef264]" },
+    { key: "naik_lemah", label: "Naik Lemah", description: "Permintaan naik perlahan", tone: "bg-amber-950/60 border-amber-500/40", accent: "text-amber-300" },
+    { key: "turun_lemah", label: "Turun Lemah", description: "Permintaan turun ringan", tone: "bg-orange-950/60 border-orange-500/40", accent: "text-orange-300" },
+    { key: "turun_signifikan", label: "Turun Signifikan", description: "Permintaan turun cepat", tone: "bg-rose-950/60 border-rose-500/40", accent: "text-rose-300" },
   ]; 
 
   const selectedItems = useMemo(() => trenGroups[activeTrend] || [], [activeTrend, trenGroups]);
-  const topItems = selectedItems.slice(0, 5);
+  const topItems = selectedItems.slice(0, 6);
 
   const example = topItems[0] || komoditasList[0] || null;
   const chartValues = useMemo(() => {
@@ -33,17 +33,17 @@ export default function KomoditasDashboard({ komoditasList, trenGroups }) {
   return (
     <Layout>
       <Head>
-        <title>Dashboard Komoditas — AgriRekomendasi</title>
+        <title>Dashboard Komoditas — AgriDiv</title>
       </Head>
 
-      <section className="grain border border-[#166534]/10 rounded-3xl bg-white/50 backdrop-blur-sm px-6 py-8 mb-6 animate-fade-in">
-        <span className="inline-flex items-center gap-2 text-[12.5px] font-bold text-[#166534] bg-[#22c55e]/12 border border-[#166534]/15 px-3 py-1 rounded-full mb-3.5">
+      <section className="grain relative overflow-hidden rounded-3xl glass-panel px-6 py-8 mb-6 animate-fade-in shadow-xl">
+        <span className="inline-flex items-center gap-2 text-[12.5px] font-extrabold text-[#bef264] bg-[#bef264]/15 border border-[#bef264]/30 px-3.5 py-1 rounded-full mb-3">
           📈 Komoditas Insights
         </span>
-        <h1 className="text-[28px] md:text-[32px] font-extrabold tracking-tight text-[#143d27] leading-tight">
+        <h1 className="text-[28px] md:text-[36px] font-black tracking-tight text-white leading-tight">
           Jelajahi Komoditas Berdasarkan Trend Demand
         </h1>
-        <p className="text-[14.5px] text-[#46604f] mt-3 max-w-2xl font-medium leading-relaxed">
+        <p className="text-[14.5px] text-emerald-100/80 mt-3 max-w-2xl font-medium leading-relaxed">
           Gunakan dashboard ini untuk menilai komoditas dengan permintaan naik, turun, atau stabil, lalu buka halaman detailnya untuk rekomendasi wilayah dan syarat tumbuh.
         </p>
         <div className="mt-8 max-w-xl mx-auto">
@@ -56,22 +56,22 @@ export default function KomoditasDashboard({ komoditasList, trenGroups }) {
         </div>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-[280px_1fr] mb-10">
+      <section className="grid gap-4 lg:grid-cols-[280px_1fr] mb-10 items-start">
         <div className="space-y-4">
-          <div className="rounded-3xl border border-[#166534]/10 bg-white p-5 shadow-sm">
-            <h2 className="text-[16px] font-extrabold text-[#143d27] mb-4">Pilih Kategori Tren</h2>
+          <div className="glass-panel rounded-3xl p-5 shadow-xl">
+            <h2 className="text-[16px] font-black text-white mb-4">Pilih Kategori Tren</h2>
             <div className="space-y-3">
               {trends.map((trend) => (
                 <button
                   key={trend.key}
                   type="button"
                   onClick={() => setActiveTrend(trend.key)}
-                  className={`w-full text-left rounded-2xl px-4 py-4 transition-all duration-300 border ${activeTrend === trend.key ? "border-[#166534] bg-[#ecfdf5] shadow-sm" : "border-[#d1fae5]/80 bg-white hover:bg-[#f7fdf7]"}`}
+                  className={`w-full text-left rounded-2xl px-4 py-4 transition-all duration-300 border ${activeTrend === trend.key ? "border-[#bef264] bg-[#22c55e]/25 shadow-lg" : "border-white/15 glass-card hover:border-white/30"}`}
                 >
                   <div className="flex items-center justify-between gap-4">
                     <div>
-                      <div className="text-[13px] uppercase tracking-[0.2em] text-[#6a8174] mb-1">{trend.label}</div>
-                      <div className="font-extrabold text-[#143d27]">{trend.description}</div>
+                      <div className="text-[12px] uppercase tracking-[0.2em] text-emerald-200/70 font-extrabold mb-1">{trend.label}</div>
+                      <div className="font-extrabold text-white">{trend.description}</div>
                     </div>
                     <span className={`text-xl ${trend.accent}`}>•</span>
                   </div>
@@ -80,54 +80,58 @@ export default function KomoditasDashboard({ komoditasList, trenGroups }) {
             </div>
           </div>
 
-          <div className="rounded-3xl border border-[#166534]/10 bg-white p-5 shadow-sm">
-            <h2 className="text-[16px] font-extrabold text-[#143d27] mb-4">Ringkasan Tren</h2>
-            <div className="space-y-2 text-[14px] text-[#4f6354]">
-              <p>Kategori ini berisi <strong>{selectedItems.length}</strong> komoditas.</p>
+          <div className="glass-panel rounded-3xl p-5 shadow-xl">
+            <h2 className="text-[16px] font-black text-white mb-3">Ringkasan Tren</h2>
+            <div className="space-y-2 text-[14px] text-emerald-100/80 font-medium">
+              <p>Kategori ini berisi <strong className="text-[#bef264]">{selectedItems.length}</strong> komoditas.</p>
               <p>Sentimen tren dipilih berdasarkan data permintaan pasar nasional.</p>
             </div>
           </div>
         </div>
 
         <div className="space-y-6">
-          <div className="rounded-3xl border border-[#166534]/10 bg-white p-6 shadow-sm">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+          <div className="glass-panel rounded-3xl p-6 shadow-xl">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-5">
               <div>
-                <p className="text-[12px] uppercase tracking-[0.25em] text-[#6a8174]">Komoditas Utama</p>
-                <h2 className="text-[22px] font-extrabold text-[#143d27]">{trenGroups[activeTrend]?.[0]?.komoditas || "Tidak ada data"}</h2>
+                <p className="text-[12px] uppercase tracking-[0.25em] text-[#bef264] font-extrabold">Komoditas Utama Kluster</p>
+                <h2 className="text-[22px] font-black text-white">{trenGroups[activeTrend]?.[0]?.komoditas || "Tidak ada data"}</h2>
               </div>
-              <Link href={`/komoditas/${encodeURIComponent(trenGroups[activeTrend]?.[0]?.komoditas || "")}`} className="inline-flex items-center gap-2 rounded-full border border-[#166534]/15 bg-white px-4 py-2 text-[13px] font-bold text-[#166534] shadow-sm transition-all duration-300 hover:bg-[#f3faf2]">
-                Buka Detail Komoditas
+              <Link href={`/komoditas/${encodeURIComponent(trenGroups[activeTrend]?.[0]?.komoditas || "")}`} className="inline-flex items-center gap-2 rounded-full border border-[#bef264]/40 bg-[#22c55e]/20 px-5 py-2.5 text-[13px] font-extrabold text-[#bef264] shadow-md hover:bg-[#22c55e]/35 transition-all">
+                Buka Detail Komoditas →
               </Link>
             </div>
-            <div className="grid gap-4 sm:grid-cols-3">
-              <StatCard label="Jumlah Komoditas" value={selectedItems.length} color="#166534" icon="📊" iconBg="bg-[#dcfce7] text-[#15803d]" />
-              <StatCard label="Slope Rata-rata" value={`${((selectedItems.reduce((acc, item) => acc + item.slope, 0) / Math.max(1, selectedItems.length)) * 100).toFixed(2)}%`} color="#16a34a" icon="📈" iconBg="bg-[#dcfce7] text-[#15803d]" />
-              <div className="rounded-3xl border border-[#166534]/10 p-4 bg-[#f8faf5]">
-                <h3 className="text-[14px] font-bold text-[#143d27] mb-3">Contoh Komoditas</h3>
-                {topItems.length ? (
-                  <ul className="space-y-2 text-[#4f6354] text-sm">
-                    {topItems.map((item) => (
-                      <li key={item.komoditas} className="rounded-2xl border border-[#e7f5e9] bg-white p-3 flex items-center justify-between gap-3">
-                        <span>{item.komoditas}</span>
-                        <Badge text={TREN_LABEL[item.tren]?.label || item.tren} color={TREN_LABEL[item.tren]?.color || "#6b7280"} />
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-gray-400">Tidak ada data untuk kategori ini.</p>
-                )}
-              </div>
+
+            {/* PROPORTIONAL STAT CARDS ROW */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <StatCard label="Jumlah Komoditas" value={selectedItems.length} sub="tanaman dalam kluster ini" color="#bef264" icon="📊" iconBg="bg-emerald-500/20 text-[#bef264] border border-emerald-500/30" />
+              <StatCard label="Slope Rata-rata" value={`${((selectedItems.reduce((acc, item) => acc + item.slope, 0) / Math.max(1, selectedItems.length)) * 100).toFixed(2)}%`} sub="pertumbuhan tahunan rerata" color="#22c55e" icon="📈" iconBg="bg-emerald-500/20 text-[#bef264] border border-emerald-500/30" />
+            </div>
+
+            {/* DEDICATED SAMPLE COMMODITIES GRID */}
+            <div className="border-t border-white/10 pt-5">
+              <h3 className="text-[14px] font-extrabold text-white mb-3">Contoh Komoditas Dalam Kluster Ini</h3>
+              {topItems.length ? (
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {topItems.map((item) => (
+                    <Link key={item.komoditas} href={`/komoditas/${encodeURIComponent(item.komoditas)}`} className="rounded-2xl border border-white/15 glass-card p-3.5 flex items-center justify-between gap-3 hover:border-[#bef264] transition-all">
+                      <span className="font-extrabold text-white text-[13.5px] truncate">{item.komoditas}</span>
+                      <Badge text={TREN_LABEL[item.tren]?.label || item.tren} color={TREN_LABEL[item.tren]?.color || "#6b7280"} />
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-emerald-200/50 text-xs">Tidak ada data untuk kategori ini.</p>
+              )}
             </div>
           </div>
 
-          <div className="rounded-3xl border border-[#166534]/10 bg-white p-6 shadow-sm">
+          <div className="glass-panel rounded-3xl p-6 shadow-xl">
             <div className="flex items-center justify-between gap-4 mb-4">
               <div>
-                <p className="text-[12px] uppercase tracking-[0.25em] text-[#6a8174]">Trend Snapshot</p>
-                <h2 className="text-[20px] font-extrabold text-[#143d27]">Contoh Grafik Permintaan</h2>
+                <p className="text-[12px] uppercase tracking-[0.25em] text-[#bef264] font-extrabold">Trend Snapshot</p>
+                <h2 className="text-[20px] font-black text-white">Contoh Grafik Permintaan</h2>
               </div>
-              <span className="text-[13px] text-[#6a8174]">{trenGroups[activeTrend]?.[0]?.komoditas || "—"}</span>
+              <span className="text-[13px] text-emerald-200/80 font-bold">{trenGroups[activeTrend]?.[0]?.komoditas || "—"}</span>
             </div>
             {example ? (
               <ForecastChart
@@ -135,11 +139,11 @@ export default function KomoditasDashboard({ komoditasList, trenGroups }) {
                 values={chartValues}
                 name={example.komoditas}
                 unit="pt"
-                color="#16a34a"
+                color="#22c55e"
                 chartType="line"
               />
             ) : (
-              <div className="text-gray-400 text-sm">Grafik tidak tersedia.</div>
+              <div className="text-emerald-200/50 text-sm">Grafik tidak tersedia.</div>
             )}
           </div>
         </div>

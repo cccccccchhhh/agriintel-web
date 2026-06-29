@@ -1,0 +1,31 @@
+{
+  "metrics": {
+    "r2_regression": 0.94,
+    "auc_direction": 0.71,
+    "auc_level": 0.78,
+    "sample_size": 14308,
+    "total_recommendations": 3800,
+    "high_prospect_count": 640
+  },
+  "feature_importance": [
+    { "feature": "Dinamika Konsumsi Historis (Lag-1 & Lag-2)", "importance": 0.42, "description": "Tren konsumsi tahun-tahun sebelumnya menjadi prediktor terkuat" },
+    { "feature": "Ukuran Populasi Wilayah", "importance": 0.28, "description": "Jumlah penduduk menentukan basis volume permintaan pasar lokal" },
+    { "feature": "Daya Beli / Pengeluaran Per Kapita", "importance": 0.18, "description": "Tingkat pendapatan menentukan elastisitas permintaan komoditas hortikultura" },
+    { "feature": "Fluktuasi Musim & Iklim ENSO", "importance": 0.08, "description": "Dampak pergeseran musim tanam terhadap ketersediaan & pasokan pasar" },
+    { "feature": "Jarak ke Sentra Permintaan Utama", "importance": 0.04, "description": "Faktor aksesibilitas logistik dan biaya distribusi antar wilayah" }
+  ],
+  "case_study_shap": {
+    "kabupaten": "SUMBA TENGAH",
+    "komoditas": "Cabe rawit",
+    "base_value": 0.50,
+    "output_value": 0.91,
+    "status": "Rekomendasi Sangat Kuat (Prospek Naik 91%)",
+    "contributions": [
+      { "feature": "Kenaikan Konsumsi Regional NTT", "value": 0.18, "direction": "positive", "desc": "Tren peningkatan konsumsi cabe rawit di Nusa Tenggara" },
+      { "feature": "Defisit Pasokan Lokal", "value": 0.12, "direction": "positive", "desc": "Keterbatasan pasokan lokal mendorong potensi harga tinggi" },
+      { "feature": "Kesesuaian Lahan S2", "value": 0.07, "direction": "positive", "desc": "Lahan cukup sesuai mendukung produksi optimal" },
+      { "feature": "Aksessibilitas Pasar Pasbar", "value": 0.04, "direction": "positive", "desc": "Konektivitas ke pasar antarkabupaten di Sumba" },
+      { "feature": "Biaya Distribusi Logistik Inter-Insular", "value": -0.00, "direction": "neutral", "desc": "Dampak netral dari tantangan distribusi antar pulau" }
+    ]
+  }
+}

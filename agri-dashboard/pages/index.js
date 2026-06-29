@@ -6,10 +6,20 @@ import StatCard from "../components/StatCard";
 import Badge from "../components/Badge";
 import Link from "next/link";
 import { useState, useMemo } from "react";
-import { getKabupatenList, getKomoditasList, getStats, getAllRekomendasi } from "../lib/data";
+import dynamic from "next/dynamic";
+import { getKabupatenList, getKomoditasList, getStats, getAllKabupatenLite, getAllRekomendasi } from "../lib/data";
 import { TREN_LABEL } from "../lib/constants";
 
-export default function Home({ kabupatenList, komoditasList, stats }) {
+const ChoroplethMap = dynamic(() => import("../components/ChoroplethMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-80 glass-card animate-pulse rounded-2xl flex items-center justify-center text-emerald-200/60 font-bold">
+      Memuat Peta Interaktif Indonesia...
+    </div>
+  ),
+});
+
+export default function Home({ kabupatenList, komoditasList, stats, allKabupaten }) {
   const [provinsi, setProvinsi] = useState("");
   const sortedKomoditas = [...komoditasList].sort((a, b) => b.slope - a.slope);
   const trendCounts = useMemo(
@@ -41,194 +51,167 @@ export default function Home({ kabupatenList, komoditasList, stats }) {
     };
   }, [provinsi, filteredKabupaten, stats]);
 
-
   return (
     <Layout>
       <Head>
-        <title>AgriRekomendasi — Rekomendasi Tanam Berbasis Data</title>
+        <title>AgriDiv — Platform Rekomendasi Diversifikasi Pertanian Presisi</title>
       </Head>
 
-      {/* HERO SECTION */}
-      <section className="grain relative overflow-hidden rounded-3xl border border-[#166534]/10 bg-white/50 backdrop-blur-sm px-6 py-12 md:py-16 text-center mb-8 animate-fade-in">
-        <span className="inline-flex items-center gap-2 text-[12.5px] font-bold text-[#166534] bg-[#22c55e]/12 border border-[#166534]/15 px-4 py-1.5 rounded-full mb-6 animate-float">
-          <span className="w-2 h-2 rounded-full bg-[#22c55e] animate-pulse"></span>
-          Data terkini · {stats.n_kabupaten_total} kabupaten/kota
-        </span>
-        <h1 className="text-[36px] md:text-[48px] leading-[1.1] font-extrabold tracking-tight text-[#143d27] max-w-3xl mx-auto animate-float">
-          Rekomendasi Komoditas Tanam<br />
-          untuk <span className="text-[#166534] relative">Petani Indonesia<span className="absolute left-0 -bottom-1 w-full h-[6px] bg-[#22c55e]/30 rounded-full -z-10"></span></span>
-        </h1>
-        <p className="mt-5 text-[15px] md:text-[16px] leading-relaxed text-[#46604f] max-w-xl mx-auto font-medium">
-          Cari tahu komoditas paling cocok untuk wilayahmu berdasarkan data iklim, kesesuaian tanah, dan tren harga pasar nasional.
-        </p>
+      {/* HERO SECTION - ULTRA PREMIUM UNIFIED FLOATING GLASS */}
+      <section className="grain relative overflow-hidden rounded-3xl glass-panel px-6 py-14 md:py-20 text-center mb-10 animate-fade-in shadow-2xl border-2 border-[#bef264]/30">
+        {/* Glow Ambient Orbs */}
+        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-[#22c55e]/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-[#bef264]/15 rounded-full blur-3xl pointer-events-none"></div>
 
-        {/* SEARCH BAR & FILTER PROVINSI */}
-        <div className="mt-8 max-w-xl mx-auto space-y-4">
-          <div className="flex flex-col sm:flex-row gap-3">
-            <select
-              value={provinsi}
-              onChange={(e) => setProvinsi(e.target.value)}
-              className="w-full sm:w-48 bg-white border border-[#166534]/20 rounded-3xl px-4 py-3 text-[14px] font-bold text-[#1a2e22] outline-none focus:border-[#166534]/40 focus:ring-2 focus:ring-[#166534]/10 transition-shadow duration-300 shadow-[0_15px_35px_-25px_rgba(22,101,52,0.45)]"
-            >
-              <option value="">Semua Provinsi</option>
-              {provinsiList.map((p) => (
-                <option key={p} value={p}>{p}</option>
-              ))}
-            </select>
-            <div className="flex-1">
-              <SearchBar
-                kabupatenList={filteredKabupaten}
-                autoFocus
-                showChips={true}
-                mode="kabupaten"
-                placeholder="Cari kabupaten/kota, mis. Garut…"
-              />
-            </div>
+        <div className="relative z-10">
+          <span className="inline-flex items-center gap-2 text-[13px] font-black text-[#bef264] bg-[#bef264]/20 border border-[#bef264]/40 px-5 py-2 rounded-full mb-6 animate-float shadow-[0_0_15px_rgba(190,242,100,0.25)]">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#bef264] animate-pulse"></span>
+            Sistem Keputusan Presisi · {stats.n_kabupaten_total} Kabupaten/Kota Terintegrasi
+          </span>
+          
+          <h1 className="text-[38px] md:text-[58px] leading-[1.1] font-black tracking-tight text-white max-w-4xl mx-auto drop-shadow-lg">
+            Platform Rekomendasi Diversifikasi Tanam<br />
+            untuk <span className="bg-gradient-to-r from-[#22c55e] via-emerald-200 to-[#bef264] bg-clip-text text-transparent relative">Ketahanan Pangan Indonesia</span>
+          </h1>
+          
+          <p className="mt-6 text-[16px] md:text-[18px] leading-relaxed text-emerald-100/90 max-w-2xl mx-auto font-medium">
+            Mengintegrasikan pemodelan iklim musiman (SARIMAX), kesesuaian biofisik lahan (FAO/ECOCROP), dan Explainable AI (SHAP) untuk mitigasi risiko iklim serta optimalisasi pendapatan petani.
+          </p>
+
+          {/* UNIFIED MASTER FLOATING SEARCH & FILTER CAPSULE BAR */}
+          <div className="mt-10 max-w-2xl mx-auto space-y-3">
+            <SearchBar
+              kabupatenList={filteredKabupaten}
+              autoFocus
+              showChips={true}
+              mode="kabupaten"
+              placeholder="Cari kabupaten/kota, mis. Garut…"
+              provinsi={provinsi}
+              setProvinsi={setProvinsi}
+              provinsiList={provinsiList}
+            />
+            {provinsi && (
+              <p className="text-[13px] text-[#bef264] font-black animate-fade-in pt-1">
+                📍 Menampilkan <strong>{filteredKabupaten.length}</strong> kabupaten/kota di <strong>{provinsi}</strong>.{" "}
+                <button onClick={() => setProvinsi("")} className="underline text-emerald-200/80 hover:text-white ml-1">
+                  Reset Filter
+                </button>
+              </p>
+            )}
           </div>
-          {provinsi && (
-            <p className="text-[12.5px] text-[#166534] font-bold animate-fade-in">
-              📍 Menampilkan <strong>{filteredKabupaten.length}</strong> kabupaten/kota di <strong>{provinsi}</strong>.{" "}
-              <button onClick={() => setProvinsi("")} className="underline text-[#8a9e92] hover:text-[#166534] ml-1">
-                Reset Filter
-              </button>
-            </p>
-          )}
         </div>
       </section>
 
       {/* STAT CARDS SECTION */}
       <section id="wilayah" className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
         <StatCard
-          label={provinsi ? "Kab/Kota di Provinsi Ini" : "Kabupaten/Kota Dianalisis"}
+          label={provinsi ? "Wilayah Dianalisis" : "Total Kabupaten/Kota"}
           value={displayStats.n_kabupaten_total}
           icon="📍"
-          iconBg="bg-[#22c55e]/15 text-[#166534]"
+          iconBg="bg-emerald-500/20 text-[#bef264] border border-emerald-500/30"
         />
         <StatCard
-          label="Rekomendasi Kuat"
+          label="Rekomendasi Kuat (S1)"
           value={displayStats.n_kabupaten_rekomendasi_kuat}
-          sub="kabupaten dengan ≥1 komoditas kuat"
-          color="#16a34a"
+          sub="wilayah dengan opsi prospek tinggi"
+          color="#bef264"
           icon="✅"
-          iconBg="bg-[#16a34a]/12 text-[#16a34a]"
+          iconBg="bg-emerald-500/20 text-[#bef264] border border-emerald-500/30"
         />
         <StatCard
-          label="Rekomendasi Lemah"
+          label="Rekomendasi Lemah (S2)"
           value={displayStats.n_kabupaten_rekomendasi_lemah}
-          sub="kabupaten dengan ≥1 komoditas lemah"
-          color="#ca8a04"
+          sub="wilayah berprospek moderat"
+          color="#fbbf24"
           icon="⚠️"
-          iconBg="bg-[#eab308]/15 text-[#ca8a04]"
+          iconBg="bg-amber-500/20 text-amber-300 border border-amber-500/30"
         />
         <StatCard
-          label="Komoditas Dianalisis"
+          label="Komoditas Terverifikasi"
           value={displayStats.n_komoditas}
-          color="#0369a1"
+          color="#38bdf8"
           icon="🌾"
-          iconBg="bg-[#0369a1]/10 text-[#0369a1]"
+          iconBg="bg-sky-500/20 text-sky-300 border border-sky-500/30"
         />
       </section>
 
-      <section id="komoditas" className="bg-white rounded-3xl border border-[#166534]/10 p-6 mb-10 shadow-sm animate-fade-in delay-100">
+      {/* PETA INTERAKTIF INDONESIA SECTION */}
+      <section className="glass-panel rounded-3xl p-6 mb-10 shadow-xl animate-fade-in">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+          <div>
+            <div className="text-[12px] font-extrabold uppercase tracking-[0.25em] text-[#bef264] mb-1">Sebaran Geografis Kesesuaian</div>
+            <h2 className="text-[22px] md:text-[26px] font-black text-white">Peta Pemetaan Kesesuaian Komoditas Indonesia</h2>
+            <p className="text-[13px] text-emerald-200/80 mt-1 font-medium">Arahkan kursor pada wilayah untuk melihat akumulasi komoditas sesuai (S1/S2), atau klik untuk mengakses laporan spasial lengkap.</p>
+          </div>
+        </div>
+        <ChoroplethMap kabupatenData={allKabupaten} />
+      </section>
+
+      {/* BLOK KOMODITAS TREN */}
+      <section id="komoditas" className="glass-panel rounded-3xl p-6 mb-10 shadow-xl animate-fade-in delay-100">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <div>
-            <div className="text-[12px] font-semibold uppercase tracking-[0.25em] text-[#6a8174] mb-2">Komoditas Dashboard</div>
-            <h2 className="text-[22px] md:text-[24px] font-extrabold text-[#143d27]">Blok Komoditas Berdasarkan Tren Permintaan</h2>
-            <p className="text-[13px] text-[#6a8174] mt-1">Pilih kategori untuk melihat komoditas naik atau turun, lalu buka detail untuk melihat grafik demand dan syarat tumbuh.</p>
+            <div className="text-[12px] font-extrabold uppercase tracking-[0.25em] text-[#bef264] mb-1">Dinamika Ekonomi Pasar</div>
+            <h2 className="text-[22px] md:text-[26px] font-black text-white">Kluster Komoditas Berdasarkan Tren Permintaan</h2>
+            <p className="text-[13px] text-emerald-200/80 mt-1 font-medium">Pilih kategori tren untuk menganalisis pergerakan konsumsi nasional dan proyeksi pertumbuhan tiap kelompok tanaman.</p>
           </div>
-          <Link href="/komoditas" className="inline-flex items-center gap-2 rounded-full border border-[#166534]/15 bg-white px-4 py-2 text-[13px] font-bold text-[#166534] shadow-sm hover:shadow-md transition-all duration-300">
-            Buka Dashboard Komoditas
+          <Link href="/komoditas" className="inline-flex items-center gap-2 rounded-full border border-[#bef264]/40 bg-[#22c55e]/20 px-5 py-2.5 text-[13px] font-extrabold text-[#bef264] shadow-md hover:bg-[#22c55e]/35 transition-all duration-300">
+            Buka Portal Komoditas →
           </Link>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {[
-            { title: "Naik Signifikan", label: "Naik Signifikan", value: trendCounts.naik_signifikan || 0, tone: "bg-[#dcfce7]", accent: "text-[#15803d]" },
-            { title: "Naik Lemah", label: "Naik Lemah", value: trendCounts.naik_lemah || 0, tone: "bg-[#fef9c3]", accent: "text-[#a16207]" },
-            { title: "Turun Lemah", label: "Turun Lemah", value: trendCounts.turun_lemah || 0, tone: "bg-[#ffedd5]", accent: "text-[#c2410c]" },
-            { title: "Turun Signifikan", label: "Turun Signifikan", value: trendCounts.turun_signifikan || 0, tone: "bg-[#fee2e2]", accent: "text-[#b91c1c]" },
+            { title: "Naik Signifikan", label: "Pertumbuhan Signifikan", value: trendCounts.naik_signifikan || 0, tone: "bg-emerald-950/60 border-emerald-500/40", accent: "text-[#bef264]" },
+            { title: "Naik Lemah", label: "Pertumbuhan Moderat", value: trendCounts.naik_lemah || 0, tone: "bg-amber-950/60 border-amber-500/40", accent: "text-amber-300" },
+            { title: "Turun Lemah", label: "Kelesuan Moderat", value: trendCounts.turun_lemah || 0, tone: "bg-orange-950/60 border-orange-500/40", accent: "text-orange-300" },
+            { title: "Turun Signifikan", label: "Kelesuan Signifikan", value: trendCounts.turun_signifikan || 0, tone: "bg-rose-950/60 border-rose-500/40", accent: "text-rose-300" },
           ].map((card) => (
-            <div key={card.title} className={`${card.tone} rounded-3xl border border-[#166534]/10 p-5 shadow-sm`}>
-              <div className="text-[13px] font-semibold uppercase tracking-[0.2em] text-[#4f6354] mb-2">{card.label}</div>
-              <div className={`text-[32px] font-extrabold ${card.accent}`}>{card.value}</div>
-              <p className="text-[13px] text-[#526558] mt-2">Komoditas dalam kategori ini.</p>
+            <div key={card.title} className={`${card.tone} rounded-3xl border p-5 shadow-lg backdrop-blur-md`}>
+              <div className="text-[12px] font-extrabold uppercase tracking-[0.2em] text-emerald-200/70 mb-2">{card.label}</div>
+              <div className={`text-[36px] font-black ${card.accent}`}>{card.value}</div>
+              <p className="text-[12px] text-emerald-200/70 mt-2 font-medium">Komoditas dalam kluster ini.</p>
             </div>
-          ))}
-        </div>
-      </section>
-
-      {/* KOMODITAS PREVIEW SECTION */}
-      <section className="bg-white rounded-3xl border border-[#166534]/10 p-6 mb-10 shadow-sm animate-fade-in delay-100">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-          <div>
-            <div className="text-[12px] font-semibold uppercase tracking-[0.25em] text-[#6a8174] mb-2">Ringkasan Komoditas</div>
-            <h2 className="text-[22px] md:text-[24px] font-extrabold text-[#143d27]">Komoditas Paling Menonjol</h2>
-            <p className="text-[13px] text-[#6a8174] mt-1">Lihat komoditas dengan tren demand terkuat dan temukan detail kecocokan untuk setiap pilihan.</p>
-          </div>
-          <Link href="/komoditas" className="inline-flex items-center gap-2 rounded-full border border-[#166534]/15 bg-white px-4 py-2 text-[13px] font-bold text-[#166534] shadow-sm hover:shadow-md transition-all duration-300">
-            Jelajahi Dashboard Komoditas
-          </Link>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {sortedKomoditas.slice(0, 6).map((k) => (
-            <Link
-              key={k.komoditas}
-              href={`/komoditas/${encodeURIComponent(k.komoditas)}`}
-              className="group block rounded-3xl border border-[#166534]/10 bg-[#f8faf5] p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
-            >
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-[13px] uppercase tracking-[0.2em] text-[#6a8174] mb-2">{k.tren.replace("_", " ")}</p>
-                  <h3 className="text-[18px] font-extrabold text-[#143d27]">{k.komoditas}</h3>
-                </div>
-                <span className="text-[24px]">🌾</span>
-              </div>
-              <div className="mt-4 flex items-center justify-between text-[13px] text-[#4f6354]">
-                <span className="font-semibold">Slope: {(k.slope * 100).toFixed(2)}%</span>
-                <Badge text={TREN_LABEL[k.tren]?.label || k.tren} color={TREN_LABEL[k.tren]?.color || "#6b7280"} />
-              </div>
-            </Link>
           ))}
         </div>
       </section>
 
       {/* ABOUT SECTION */}
       <section id="tentang" className="grid gap-6 lg:grid-cols-3 mb-10 animate-fade-in delay-150">
-        <div className="glass-panel rounded-3xl p-6 border border-[#166534]/10 shadow-sm">
-          <div className="w-12 h-12 rounded-2xl bg-[#16a34a]/10 text-[#166534] flex items-center justify-center text-xl mb-4">📊</div>
-          <h3 className="text-[18px] font-extrabold text-[#143d27] mb-2">Data Pertanian Terpercaya</h3>
-          <p className="text-sm text-[#536d5c] leading-relaxed">Analisis iklim, tanah, dan permintaan pasar digabungkan untuk rekomendasi komoditas yang lebih relevan.</p>
+        <div className="glass-panel rounded-3xl p-6 shadow-xl">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-[#bef264] border border-emerald-500/30 flex items-center justify-center text-2xl mb-4">📊</div>
+          <h3 className="text-[18px] font-black text-white mb-2">Integrasi Data Multi-Pilar</h3>
+          <p className="text-xs text-emerald-200/80 leading-relaxed font-medium">Memadukan data iklim historis BMKG, survei tanah FAO, dan tren konsumsi BPS untuk keputusan berbasis sains.</p>
         </div>
-        <div className="glass-panel rounded-3xl p-6 border border-[#166534]/10 shadow-sm">
-          <div className="w-12 h-12 rounded-2xl bg-[#bef264]/10 text-[#166534] flex items-center justify-center text-xl mb-4">🌾</div>
-          <h3 className="text-[18px] font-extrabold text-[#143d27] mb-2">Fokus Wilayah & Komoditas</h3>
-          <p className="text-sm text-[#536d5c] leading-relaxed">Pilih kabupaten atau komoditas untuk melihat rekomendasi dan detail kecocokan secara cepat.</p>
+        <div className="glass-panel rounded-3xl p-6 shadow-xl">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-[#bef264] border border-emerald-500/30 flex items-center justify-center text-2xl mb-4">🌾</div>
+          <h3 className="text-[18px] font-black text-white mb-2">Presisi Agroekologi Wilayah</h3>
+          <p className="text-xs text-emerald-200/80 leading-relaxed font-medium">Evaluasi kesesuaian spesifik hingga tingkat kabupaten untuk mencegah kegagalan tanam akibat salah komoditas.</p>
         </div>
-        <div className="glass-panel rounded-3xl p-6 border border-[#166534]/10 shadow-sm">
-          <div className="w-12 h-12 rounded-2xl bg-[#236a3d]/10 text-[#166534] flex items-center justify-center text-xl mb-4">⚡</div>
-          <h3 className="text-[18px] font-extrabold text-[#143d27] mb-2">Cepat & Mudah Digunakan</h3>
-          <p className="text-sm text-[#536d5c] leading-relaxed">Desain halaman bersih dan intuitif, cocok untuk petani yang ingin keputusan cepat tanpa kompleksitas.</p>
+        <div className="glass-panel rounded-3xl p-6 shadow-xl">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-[#bef264] border border-emerald-500/30 flex items-center justify-center text-2xl mb-4">⚡</div>
+          <h3 className="text-[18px] font-black text-white mb-2">Transparansi Model (XAI)</h3>
+          <p className="text-xs text-emerald-200/80 leading-relaxed font-medium">Dilengkapi atribusi SHAP waterfall untuk menyajikan alasan kuantitatif di balik setiap angka rekomendasi.</p>
         </div>
       </section>
 
       {/* CALL TO ACTION BANNER */}
-      <section className="relative overflow-hidden rounded-3xl bg-[#166534] px-8 py-12 md:py-14 text-center shadow-[0_12px_40px_-15px_rgba(22,101,52,0.4)] animate-fade-in delay-200 mb-6">
-        <div className="grain absolute inset-0 opacity-15"></div>
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#0c2417] via-[#143d27] to-[#166534] border border-[#bef264]/40 px-8 py-12 md:py-14 text-center shadow-2xl animate-fade-in delay-200 mb-6">
+        <div className="grain absolute inset-0 opacity-10"></div>
         <div className="relative z-10">
-          <h3 className="text-[26px] md:text-[32px] font-extrabold tracking-tight text-white leading-tight">
-            Punya lahan sendiri tapi bingung mau ditanami apa?
+          <h3 className="text-[26px] md:text-[36px] font-black tracking-tight text-white leading-tight">
+            Ingin Menganalisis Kesesuaian Lahan Mandiri?
           </h3>
-          <p className="text-[15px] text-[#bfe6cb] mt-3.5 max-w-xl mx-auto font-semibold leading-relaxed">
-            Masukkan kondisi tanah, curah hujan, elevasi, dan suhu secara manual untuk mendapatkan kalkulasi kesesuaian lahan yang akurat.
+          <p className="text-[15px] text-emerald-100/90 mt-3.5 max-w-xl mx-auto font-semibold leading-relaxed">
+            Gunakan kalkulator berbasis aturan (Rule-Based Evaluation) untuk memasukkan parameter pH, curah hujan, suhu, dan elevasi spesifik lahan Anda.
           </p>
           <Link
             href="/ruled-based"
-            className="mt-6 inline-flex items-center gap-2 bg-[#bef264] hover:bg-[#a3e635] text-[#143d27] text-[15px] font-extrabold px-6 py-3 rounded-2xl shadow-[0_8px_25px_-5px_rgba(0,0,0,0.3)] hover:-translate-y-0.5 transition-all duration-300"
+            className="mt-7 inline-flex items-center gap-2 bg-gradient-to-r from-[#bef264] to-[#a3e635] hover:brightness-110 text-[#08140c] text-[15px] font-black px-7 py-3.5 rounded-2xl shadow-[0_0_25px_rgba(190,242,100,0.4)] hover:-translate-y-0.5 transition-all duration-300"
           >
-            Cek Lahan Anda Sekarang →
+            Evaluasi Lahan Anda Sekarang →
           </Link>
-          <p className="text-[12px] text-[#9fd3b0] mt-3 font-semibold">Gratis · Tanpa Perlu Registrasi</p>
+          <p className="text-[12px] text-emerald-200/80 mt-3.5 font-bold">Gratis · Tanpa Autentikasi · Hasil Instan</p>
         </div>
       </section>
     </Layout>
@@ -249,11 +232,14 @@ export async function getStaticProps() {
     };
   });
 
+  const allKabupaten = getAllKabupatenLite();
+
   return {
     props: {
       kabupatenList: kabupatenListWithFlags,
       komoditasList,
       stats: getStats(),
+      allKabupaten,
     },
   };
 }

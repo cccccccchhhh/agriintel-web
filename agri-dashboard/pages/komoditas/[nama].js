@@ -10,28 +10,7 @@ import { getAllNamaKomoditas, getKomoditasPageData } from "../../lib/data";
 import { TREN_LABEL, KELAS_LABEL } from "../../lib/constants";
 
 const EMOJI_MAP = {
-  padi: "🌾",
-  jagung: "🌽",
-  bawang: "🧅",
-  tomat: "🍅",
-  wortel: "🥕",
-  sawi: "🥬",
-  bayam: "🥬",
-  kubis: "🥬",
-  kacang: "🥜",
-  cabe: "🌶️",
-  durian: "🍈",
-  mangga: "🥭",
-  pepaya: "🍈",
-  pisang: "🍌",
-  terong: "🍆",
-  melon: "🍈",
-  ubi: "🍠",
-  kangkung: "🥬",
-  kedelai: "🫘",
-  kelapa: "🥥",
-  kopi: "☕",
-  teh: "🍵",
+  padi: "🌾", jagung: "🌽", bawang: "🧅", tomat: "🍅", wortel: "🥕", sawi: "🥬", bayam: "🥬", kubis: "🥬", kacang: "🥜", cabe: "🌶️", durian: "🍈", mangga: "🥭", pepaya: "🍈", pisang: "🍌", terong: "🍆", melon: "🍈", ubi: "🍠", kangkung: "🥬", kedelai: "🫘", kelapa: "🥥", kopi: "☕", teh: "🍵",
 };
 
 function getEmoji(name) {
@@ -42,11 +21,8 @@ function getEmoji(name) {
   return "🌱";
 }
 
-// ── Range Bar ──────────────────────────────────────────────────────────────────
-// Renders a horizontal bar showing [abs_min … opt_min … opt_max … abs_max] on a
-// fixed domain. Absolute range is light-coloured, optimal range is darker.
-function RangeBar({ absMin, absMax, optMin, optMax, domainMin, domainMax, unit, color = "#16a34a" }) {
-  if (absMin == null || absMax == null) return <span className="text-gray-400 text-sm">—</span>;
+function RangeBar({ absMin, absMax, optMin, optMax, domainMin, domainMax, unit, color = "#22c55e" }) {
+  if (absMin == null || absMax == null) return <span className="text-emerald-200/50 text-sm">—</span>;
 
   const span = domainMax - domainMin || 1;
   const pct = (v) => `${(((v - domainMin) / span) * 100).toFixed(1)}%`;
@@ -55,27 +31,27 @@ function RangeBar({ absMin, absMax, optMin, optMax, domainMin, domainMax, unit, 
   const hasOpt = optMin != null && optMax != null;
 
   return (
-    <div className="space-y-1">
-      <div className="relative h-4 rounded bg-gray-100 overflow-hidden">
+    <div className="space-y-1.5">
+      <div className="relative h-4 rounded-full bg-black/30 overflow-hidden border border-white/10">
         {/* absolute range */}
         <div
-          className="absolute h-full rounded opacity-30"
+          className="absolute h-full rounded-full opacity-40"
           style={{ left: pct(absMin), width: width(absMin, absMax), backgroundColor: color }}
         />
         {/* optimal range */}
         {hasOpt && (
           <div
-            className="absolute h-full rounded"
+            className="absolute h-full rounded-full shadow-[0_0_10px_rgba(34,197,94,0.6)]"
             style={{ left: pct(optMin), width: width(optMin, optMax), backgroundColor: color }}
           />
         )}
       </div>
-      <div className="flex justify-between text-[11px] text-gray-500">
+      <div className="flex justify-between text-[11px] text-emerald-200/80 font-semibold">
         <span>
           Absolut: {absMin}–{absMax} {unit}
         </span>
         {hasOpt && (
-          <span className="font-medium" style={{ color }}>
+          <span className="font-extrabold text-[#bef264]">
             Optimal: {optMin}–{optMax} {unit}
           </span>
         )}
@@ -84,7 +60,6 @@ function RangeBar({ absMin, absMax, optMin, optMax, domainMin, domainMax, unit, 
   );
 }
 
-// ── Tekstur Badge list ─────────────────────────────────────────────────────────
 const TEKSTUR_ID = {
   light: "Ringan/Berpasir",
   medium: "Sedang/Lempung",
@@ -94,7 +69,7 @@ const TEKSTUR_ID = {
 };
 
 function TeksturBadges({ value, isOpt }) {
-  if (!value) return <span className="text-gray-400 text-sm">—</span>;
+  if (!value) return <span className="text-emerald-200/50 text-sm">—</span>;
   const lower = value.toLowerCase();
   const items = lower.includes("wide")
     ? ["wide"]
@@ -104,11 +79,11 @@ function TeksturBadges({ value, isOpt }) {
       {items.map((t) => (
         <span
           key={t}
-          className="text-xs px-2 py-0.5 rounded-full border"
+          className="text-xs px-2.5 py-0.5 rounded-full border font-bold"
           style={
             isOpt
-              ? { borderColor: "#16a34a", color: "#16a34a", background: "#16a34a1A" }
-              : { borderColor: "#9ca3af", color: "#6b7280", background: "#f3f4f6" }
+              ? { borderColor: "rgba(190,242,100,0.5)", color: "#bef264", background: "rgba(34,197,94,0.2)" }
+              : { borderColor: "rgba(255,255,255,0.2)", color: "#e2e8f0", background: "rgba(255,255,255,0.05)" }
           }
         >
           {TEKSTUR_ID[t] || t}
@@ -118,14 +93,15 @@ function TeksturBadges({ value, isOpt }) {
   );
 }
 
-// ── Page ───────────────────────────────────────────────────────────────────────
 export default function KomoditasPage({ namaKomoditas, lurRow, trenData, kabupatenCocok }) {
   const tren = trenData?.tren;
   const trenMeta = TREN_LABEL[tren] || {};
   const st = lurRow?.syarat_tumbuh ?? trenData?.syarat_tumbuh ?? null;
 
-  const nS1 = kabupatenCocok.filter((k) => k.kelas === "S1").length;
-  const nS2 = kabupatenCocok.filter((k) => k.kelas === "S2").length;
+  const listCocok = kabupatenCocok || [];
+  const nS1 = listCocok.filter((k) => k.kelas === "S1").length;
+  const nS2 = listCocok.filter((k) => k.kelas === "S2").length;
+
   const [chartType, setChartType] = useState("line");
 
   const forecastMonths = useMemo(
@@ -146,22 +122,22 @@ export default function KomoditasPage({ namaKomoditas, lurRow, trenData, kabupat
   return (
     <Layout>
       <Head>
-        <title>{namaKomoditas} — AgriRekomendasi</title>
+        <title>{namaKomoditas} — AgriDiv</title>
       </Head>
 
-      {/* BREADCRUMB */}
-      <nav className="text-xs md:text-sm text-gray-400 mb-4 font-bold flex items-center gap-1.5 animate-fade-in">
-        <Link href="/" className="hover:text-[#166534] transition-colors">Beranda</Link>
-        <span>/</span>
-        <span className="text-gray-600">{namaKomoditas}</span>
+      {/* BREADCRUMB - HIGH CONTRAST */}
+      <nav className="text-xs md:text-sm text-emerald-200/80 mb-4 font-bold flex items-center gap-2 animate-fade-in">
+        <Link href="/" className="hover:text-[#bef264] transition-colors">Beranda</Link>
+        <span className="text-emerald-500/50">/</span>
+        <span className="text-white font-black">{namaKomoditas}</span>
       </nav>
 
-      {/* HEADER BANNER */}
+      {/* HEADER BANNER - HIGH CONTRAST WHITE */}
       <header className="mb-6 flex flex-wrap items-center gap-3 animate-fade-in">
-        <div className="w-10 h-10 rounded-xl bg-[#166534]/10 flex items-center justify-center text-[22px]">
+        <div className="w-12 h-12 rounded-2xl bg-[#22c55e]/20 text-[#bef264] border border-[#22c55e]/30 flex items-center justify-center text-[26px] shadow-sm">
           {getEmoji(namaKomoditas)}
         </div>
-        <h1 className="text-[28px] md:text-[32px] font-extrabold text-[#143d27] animate-float cursor-default">
+        <h1 className="text-[32px] md:text-[42px] font-black text-white cursor-default drop-shadow-md">
           {namaKomoditas}
         </h1>
         {tren && (
@@ -175,17 +151,17 @@ export default function KomoditasPage({ namaKomoditas, lurRow, trenData, kabupat
           label="Kabupaten Sangat Cocok"
           value={nS1}
           sub="kelas S1"
-          color="#16a34a"
+          color="#bef264"
           icon="✅"
-          iconBg="bg-green-50 text-green-700"
+          iconBg="bg-emerald-500/20 text-[#bef264] border border-emerald-500/30"
         />
         <StatCard
           label="Kabupaten Cukup Cocok"
           value={nS2}
           sub="kelas S2"
-          color="#ca8a04"
+          color="#fbbf24"
           icon="⚠️"
-          iconBg="bg-yellow-50 text-yellow-700"
+          iconBg="bg-amber-500/20 text-amber-300 border border-amber-500/30"
         />
         {trenData ? (
           <>
@@ -193,17 +169,17 @@ export default function KomoditasPage({ namaKomoditas, lurRow, trenData, kabupat
               label="Slope Tren Demand"
               value={`${trenData.slope > 0 ? "+" : ""}${(trenData.slope * 100).toFixed(2)}%`}
               sub="per tahun"
-              color={trenMeta.color || "#6b7280"}
+              color={trenMeta.color || "#22c55e"}
               icon="📈"
-              iconBg="bg-[#166534]/8 text-[#166534]"
+              iconBg="bg-emerald-500/20 text-[#bef264] border border-emerald-500/30"
             />
             <StatCard
               label="Tahun Data"
               value={trenData.n_tahun_data}
               sub={trenData.model_type}
-              color="#0369a1"
+              color="#38bdf8"
               icon="📅"
-              iconBg="bg-blue-50 text-blue-700"
+              iconBg="bg-sky-500/20 text-sky-300 border border-sky-500/30"
             />
           </>
         ) : (
@@ -212,44 +188,44 @@ export default function KomoditasPage({ namaKomoditas, lurRow, trenData, kabupat
               label="Slope Tren Demand"
               value="—"
               sub="tidak ada data"
-              color="#6b7280"
+              color="#94a3b8"
               icon="📈"
-              iconBg="bg-gray-100 text-gray-500"
+              iconBg="bg-white/10 text-emerald-200/50"
             />
             <StatCard
               label="Tahun Data"
               value="—"
               sub="n/a"
-              color="#6b7280"
+              color="#94a3b8"
               icon="📅"
-              iconBg="bg-gray-100 text-gray-500"
+              iconBg="bg-white/10 text-emerald-200/50"
             />
           </>
         )}
       </section>
 
-      {/* CHART TOGGLE SECTION */}
+      {/* CHART TOGGLE SECTION - HIGH CONTRAST */}
       <section className="mb-8 animate-fade-in delay-100">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
           <div>
-            <h2 className="text-[18px] md:text-[20px] font-extrabold text-[#143d27]">Visualisasi Tren Komoditas</h2>
-            <p className="text-[13px] text-[#6a8174] mt-1 font-semibold">Klik tombol untuk beralih antara line chart dan area chart.</p>
+            <h2 className="text-[18px] md:text-[22px] font-black text-white">Visualisasi Tren Komoditas</h2>
+            <p className="text-[13px] text-emerald-200/70 mt-1 font-medium">Klik tombol untuk beralih antara line chart dan area chart.</p>
           </div>
           <button
             type="button"
             onClick={() => setChartType((prev) => (prev === "line" ? "area" : "line"))}
-            className="self-start md:self-auto inline-flex items-center gap-2 rounded-full border border-[#166534]/15 bg-white px-4 py-2 text-[13px] font-bold text-[#166534] shadow-sm hover:shadow-md transition-all duration-300"
+            className="self-start md:self-auto inline-flex items-center gap-2 rounded-full border border-[#bef264]/40 bg-[#22c55e]/20 px-5 py-2.5 text-[13px] font-black text-[#bef264] shadow-md hover:bg-[#22c55e]/35 transition-all"
           >
             {chartType === "line" ? "Tampilan Area Chart" : "Tampilan Line Chart"}
           </button>
         </div>
-        <div className="bg-white rounded-3xl border border-[#166534]/10 p-5 shadow-sm hover:shadow-md transition-all duration-300">
+        <div className="glass-panel rounded-3xl p-5 shadow-xl">
           <ForecastChart
             labels={forecastMonths}
             values={forecastValues}
             name={`${namaKomoditas} Forecast`}
             unit="pt"
-            color="#16a34a"
+            color="#22c55e"
             chartType={chartType}
           />
         </div>
@@ -257,12 +233,12 @@ export default function KomoditasPage({ namaKomoditas, lurRow, trenData, kabupat
 
       {/* SYARAT TUMBUH SECTION */}
       <section className="mb-10 animate-fade-in delay-100">
-        <h2 className="text-[18px] md:text-[20px] font-extrabold mb-4 text-[#143d27]">Syarat Tumbuh (FAO/ECOCROP)</h2>
+        <h2 className="text-[18px] md:text-[22px] font-black mb-4 text-white">Syarat Tumbuh (FAO/ECOCROP)</h2>
         {st ? (
-          <div className="bg-white rounded-3xl border border-[#166534]/10 p-6 space-y-6 shadow-sm">
+          <div className="glass-panel rounded-3xl p-6 space-y-6 shadow-xl">
             {/* pH */}
-            <div className="grid md:grid-cols-[160px_1fr] items-start gap-2 border-b border-gray-100 pb-5">
-              <div className="text-[14px] font-extrabold text-[#1a2e22] mt-1 flex items-center gap-1.5">
+            <div className="grid md:grid-cols-[160px_1fr] items-start gap-2 border-b border-white/10 pb-5">
+              <div className="text-[14px] font-extrabold text-white mt-1 flex items-center gap-2">
                 <span>🧪</span> pH Tanah
               </div>
               <div className="w-full">
@@ -274,14 +250,14 @@ export default function KomoditasPage({ namaKomoditas, lurRow, trenData, kabupat
                   domainMin={3}
                   domainMax={10}
                   unit=""
-                  color="#16a34a"
+                  color="#22c55e"
                 />
               </div>
             </div>
 
             {/* Curah Hujan */}
-            <div className="grid md:grid-cols-[160px_1fr] items-start gap-2 border-b border-gray-100 pb-5">
-              <div className="text-[14px] font-extrabold text-[#1a2e22] mt-1 flex items-center gap-1.5">
+            <div className="grid md:grid-cols-[160px_1fr] items-start gap-2 border-b border-white/10 pb-5">
+              <div className="text-[14px] font-extrabold text-white mt-1 flex items-center gap-2">
                 <span>🌧️</span> Curah Hujan Tahunan
               </div>
               <div className="w-full">
@@ -293,14 +269,14 @@ export default function KomoditasPage({ namaKomoditas, lurRow, trenData, kabupat
                   domainMin={0}
                   domainMax={5000}
                   unit="mm/thn"
-                  color="#0284c7"
+                  color="#38bdf8"
                 />
               </div>
             </div>
 
             {/* Suhu */}
-            <div className="grid md:grid-cols-[160px_1fr] items-start gap-2 border-b border-gray-100 pb-5">
-              <div className="text-[14px] font-extrabold text-[#1a2e22] mt-1 flex items-center gap-1.5">
+            <div className="grid md:grid-cols-[160px_1fr] items-start gap-2 border-b border-white/10 pb-5">
+              <div className="text-[14px] font-extrabold text-white mt-1 flex items-center gap-2">
                 <span>🌡️</span> Suhu Rata-rata
               </div>
               <div className="w-full">
@@ -312,56 +288,56 @@ export default function KomoditasPage({ namaKomoditas, lurRow, trenData, kabupat
                   domainMin={0}
                   domainMax={50}
                   unit="°C"
-                  color="#d97706"
+                  color="#fbbf24"
                 />
               </div>
             </div>
 
             {/* Elevasi */}
-            <div className="grid md:grid-cols-[160px_1fr] items-start gap-2 border-b border-gray-100 pb-5">
-              <div className="text-[14px] font-extrabold text-[#1a2e22] mt-1 flex items-center gap-1.5">
+            <div className="grid md:grid-cols-[160px_1fr] items-start gap-2 border-b border-white/10 pb-5">
+              <div className="text-[14px] font-extrabold text-white mt-1 flex items-center gap-2">
                 <span>⛰️</span> Elevasi Maksimum
               </div>
               <div className="w-full">
                 {st.altitude_maks_m != null ? (
                   <div className="space-y-2">
-                    <div className="relative h-4 rounded-full bg-gray-100 overflow-hidden border border-gray-200/50">
+                    <div className="relative h-4 rounded-full bg-black/30 overflow-hidden border border-white/10">
                       <div
-                        className="absolute h-full rounded-full opacity-60"
+                        className="absolute h-full rounded-full opacity-80 shadow-[0_0_10px_rgba(168,85,247,0.6)]"
                         style={{
                           left: 0,
                           width: `${Math.min(100, (st.altitude_maks_m / 4000) * 100).toFixed(1)}%`,
-                          backgroundColor: "#7c3aed",
+                          backgroundColor: "#a855f7",
                         }}
                       />
                     </div>
-                    <div className="text-[11.5px] text-gray-500 font-bold">Batas Maksimal: {st.altitude_maks_m} mdpl</div>
+                    <div className="text-[11.5px] text-emerald-200/70 font-bold">Batas Maksimal: {st.altitude_maks_m} mdpl</div>
                   </div>
                 ) : (
-                  <span className="text-gray-400 text-sm font-semibold">Tidak ada batasan elevasi khusus</span>
+                  <span className="text-emerald-200/50 text-sm font-semibold">Tidak ada batasan elevasi khusus</span>
                 )}
               </div>
             </div>
 
             {/* Tekstur */}
             <div className="grid md:grid-cols-[160px_1fr] items-start gap-2">
-              <div className="text-[14px] font-extrabold text-[#1a2e22] mt-1 flex items-center gap-1.5">
+              <div className="text-[14px] font-extrabold text-white mt-1 flex items-center gap-2">
                 <span>🪨</span> Tekstur Tanah
               </div>
               <div className="space-y-3 pl-1">
                 <div className="flex items-center gap-3 text-[13px] font-bold">
-                  <span className="text-[#6a8174] w-20 shrink-0">Optimal:</span>
+                  <span className="text-emerald-200/70 w-20 shrink-0">Optimal:</span>
                   <TeksturBadges value={st.tekstur_opt} isOpt={true} />
                 </div>
                 <div className="flex items-center gap-3 text-[13px] font-bold">
-                  <span className="text-[#6a8174] w-20 shrink-0">Toleransi:</span>
+                  <span className="text-emerald-200/70 w-20 shrink-0">Toleransi:</span>
                   <TeksturBadges value={st.tekstur_abs} isOpt={false} />
                 </div>
               </div>
             </div>
           </div>
         ) : (
-          <p className="text-gray-400 bg-white rounded-3xl border border-[#166534]/10 p-6 shadow-sm">
+          <p className="text-emerald-200/50 glass-panel rounded-3xl p-6 shadow-xl">
             Data syarat tumbuh belum tersedia untuk komoditas ini.
           </p>
         )}
@@ -370,42 +346,42 @@ export default function KomoditasPage({ namaKomoditas, lurRow, trenData, kabupat
       {/* KABUPATEN COCOK SECTION */}
       <section className="mb-10 animate-fade-in delay-200">
         <div className="mb-4">
-          <h2 className="text-[18px] md:text-[20px] font-extrabold text-[#143d27]">
+          <h2 className="text-[18px] md:text-[22px] font-black text-white">
             Kabupaten/Kota yang Cocok
           </h2>
-          <p className="text-[13px] text-[#6a8174] mt-1 font-semibold">
-            Menampilkan {kabupatenCocok.length} wilayah yang sesuai — S1 (sangat cocok) diprioritaskan.
+          <p className="text-[13px] text-emerald-200/70 mt-1 font-medium">
+            Menampilkan {listCocok.length} wilayah yang sesuai — S1 (sangat cocok) diprioritaskan.
           </p>
         </div>
 
-        {kabupatenCocok.length === 0 ? (
-          <p className="text-gray-400 bg-white rounded-3xl border border-[#166534]/10 p-6 shadow-sm text-center">
+        {listCocok.length === 0 ? (
+          <p className="text-emerald-200/50 glass-panel rounded-3xl p-6 shadow-xl text-center">
             Tidak ada kabupaten/kota yang masuk kelas S1 atau S2 untuk komoditas ini.
           </p>
         ) : (
-          <div className="overflow-x-auto rounded-3xl border border-[#166534]/8">
+          <div className="overflow-x-auto rounded-3xl border border-white/10 glass-panel shadow-xl">
             <table className="w-full text-left border-collapse min-w-[500px]">
               <thead>
-                <tr className="bg-[#f3f8f4] text-[#5a7265] text-[12px] font-bold uppercase tracking-wider">
+                <tr className="bg-black/20 text-emerald-200/70 text-[12px] font-black uppercase tracking-wider">
                   <th className="px-5 py-3.5">#</th>
                   <th className="px-5 py-3.5">Kabupaten/Kota</th>
                   <th className="px-5 py-3.5">Provinsi</th>
                   <th className="px-5 py-3.5">Kelas Kesesuaian</th>
                 </tr>
               </thead>
-              <tbody>
-                {kabupatenCocok.map((kab, i) => (
-                  <tr key={kab.kode_kab} className="border-t border-[#166534]/6 hover:bg-[#faf9f4]/60 transition-colors duration-150">
-                    <td className="px-5 py-4 text-gray-400 font-bold text-[13px]">{i + 1}</td>
-                    <td className="px-5 py-4 font-bold text-[14.5px]">
+              <tbody className="divide-y divide-white/5 text-xs">
+                {listCocok.map((kab, i) => (
+                  <tr key={kab.kode_kab} className="hover:bg-white/5 transition-colors duration-150">
+                    <td className="px-5 py-4 text-emerald-200/50 font-bold text-[13px]">{i + 1}</td>
+                    <td className="px-5 py-4 font-black text-[14.5px]">
                       <Link
                         href={`/kabupaten/${kab.kode_kab}`}
-                        className="text-[#166534] hover:underline"
+                        className="text-[#bef264] hover:underline"
                       >
                         {kab.nama_kab}
                       </Link>
                     </td>
-                    <td className="px-5 py-4 text-gray-500 font-semibold">{kab.provinsi}</td>
+                    <td className="px-5 py-4 text-emerald-200/80 font-semibold">{kab.provinsi}</td>
                     <td className="px-5 py-4">
                       <Badge
                         text={KELAS_LABEL[kab.kelas]?.label || kab.kelas}

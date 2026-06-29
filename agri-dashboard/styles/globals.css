@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,12 +7,17 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    background-color: #faf7f0;
+    background-color: #08140c;
+    color: #f0fdf4;
   }
   body {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-    background-color: #faf7f0;
-    color: #1a2e22;
+    background-image: url('/bg-nature.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    color: #f0fdf4;
     margin: 0;
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
@@ -23,24 +28,63 @@
   }
 }
 
-.grain {
-  background-image: radial-gradient(rgba(22,101,52,0.05) 1px, transparent 1px);
-  background-size: 22px 22px;
+/* Custom Polish Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(8, 20, 12, 0.6);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(34, 197, 94, 0.4);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(190, 242, 100, 0.7);
 }
 
+.grain {
+  background-image: radial-gradient(rgba(34, 197, 94, 0.12) 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
+}
+
+/* DARK EMERALD NATURE GLASS CONTAINERS & CARDS (MATCHING REFERENCE IMAGE) */
 .glass-panel {
-  background: rgba(255,255,255,0.90);
-  backdrop-filter: blur(18px);
-  border: 1px solid rgba(22,101,52,0.12);
+  background: linear-gradient(135deg, rgba(16, 46, 28, 0.78) 0%, rgba(10, 31, 18, 0.85) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1.5px solid rgba(190, 242, 100, 0.25);
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  color: #f0fdf4;
+}
+
+.glass-card {
+  background: linear-gradient(135deg, rgba(20, 55, 34, 0.72) 0%, rgba(14, 40, 24, 0.8) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3), inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  color: #f0fdf4;
+}
+
+.glass-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(190, 242, 100, 0.5);
+  box-shadow: 0 20px 40px -8px rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.25);
 }
 
 .badge {
   display: inline-flex;
   align-items: center;
-  padding: 0.28rem 0.75rem;
+  padding: 0.35rem 0.85rem;
   border-radius: 9999px;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 800;
+  letter-spacing: 0.025em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 @keyframes fadeInUp {
@@ -61,26 +105,16 @@
 
 @keyframes floatText {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+  50% { transform: translateY(-5px); }
 }
 
 @keyframes pulseSoft {
   0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.03); opacity: 0.94; }
+  50% { transform: scale(1.02); opacity: 0.92; }
 }
 
 .animate-float {
-  animation: floatText 3.8s ease-in-out infinite;
-}
-
-@keyframes bounceSlow {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-}
-
-@keyframes glowPulse {
-  0%, 100% { box-shadow: 0 0 0 rgba(22,163,74,0.12); }
-  50% { box-shadow: 0 0 26px rgba(22,163,74,0.15); }
+  animation: floatText 4s ease-in-out infinite;
 }
 
 .animate-fade-in-up {
@@ -92,22 +126,12 @@
 }
 
 .animate-pulse-soft {
-  animation: pulseSoft 2.4s infinite ease-in-out;
-}
-
-.animate-bounce-slow {
-  animation: bounceSlow 4s infinite ease-in-out;
-}
-
-.animate-glow-pulse {
-  animation: glowPulse 2.6s infinite ease-in-out;
+  animation: pulseSoft 2.5s infinite ease-in-out;
 }
 
 .delay-100 { animation-delay: 100ms; }
 .delay-200 { animation-delay: 200ms; }
 .delay-300 { animation-delay: 300ms; }
-.delay-400 { animation-delay: 400ms; }
-.delay-500 { animation-delay: 500ms; }
 
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {

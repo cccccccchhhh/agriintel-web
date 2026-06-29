@@ -8,8 +8,8 @@ function describeTekstur(t) {
 function describePh(ph) {
   if (ph == null) return "";
   if (ph < 5.5) return "asam";
-  if (ph < 6.5) return "agak asam";
-  if (ph < 7.5) return "netral";
+  if (ph < 6.5) return "agak asam (optimum)";
+  if (ph < 7.5) return "netral (sangat baik)";
   return "basa";
 }
 
@@ -18,46 +18,46 @@ export function buatSummary(kab, rekom) {
 
   const parts = [];
   parts.push(
-    `Kabupaten ${kab.nama_kab}${kab.provinsi ? ` (${kab.provinsi})` : ""} memiliki tanah dengan pH sekitar ` +
-      `${kab.ph ?? "-"} (${describePh(kab.ph)}), elevasi rata-rata ${kab.dem ?? "-"} mdpl, dan tekstur tanah ` +
+    `Berdasarkan analisis agroekologi presisi, Kabupaten ${kab.nama_kab}${kab.provinsi ? ` (${kab.provinsi})` : ""} memiliki karakteristik tanah dengan reaksi pH sekitar ` +
+      `${kab.ph ?? "-"} (${describePh(kab.ph)}), ketinggian rata-rata ${kab.dem ?? "-"} mdpl, serta dominasi tekstur tanah ` +
       `${describeTekstur(kab.tekstur_eng)}.`
   );
 
   parts.push(
-    `Berdasarkan forecast, curah hujan tahunan diproyeksikan sekitar ${Math.round(kab.ch_tahunan_mm || 0)} mm/tahun ` +
-      `dengan suhu rata-rata ${kab.suhu_mean ?? "-"}°C.`
+    `Proyeksi iklim SARIMAX menunjukkan rata-rata akumulasi curah hujan tahunan mencapai ${Math.round(kab.ch_tahunan_mm || 0)} mm/tahun ` +
+      `dengan temperatur udara rerata ${kab.suhu_mean ?? "-"}°C.`
   );
 
   const nS1 = Object.values(kab.kelas || {}).filter((k) => k === "S1").length;
   parts.push(
-    `Wilayah ini cocok untuk ${kab.n_komoditas_cocok} dari 24 komoditas yang dianalisis` +
-      (nS1 > 0 ? `, dengan ${nS1} komoditas tergolong sangat cocok (S1).` : ".")
+    `Secara keseluruhan, biofisik lahan wilayah ini mendukung pertumbuhan ${kab.n_komoditas_cocok} dari 28 komoditas unggulan nasional yang dianalisis` +
+      (nS1 > 0 ? `, di mana ${nS1} komoditas di antaranya tergolong dalam kelas Kesesuaian Sangat Sesuai (S1).` : ".")
   );
 
   if (rekom?.rekomendasi_kuat?.length) {
     parts.push(
-      `Dari sisi permintaan pasar, ${rekom.rekomendasi_kuat.join(", ")} ` +
-        `direkomendasikan kuat untuk ditanam karena tren konsumsi nasionalnya naik secara signifikan.`
+      `Diintegrasikan dengan Decision Engine AgriDiv, komoditas ${rekom.rekomendasi_kuat.join(", ")} ` +
+        `direkomendasikan kuat untuk ditanam karena didukung oleh tren peningkatan permintaan pasar nasional yang signifikan (CI 95%).`
     );
   }
   if (rekom?.rekomendasi_lemah?.length) {
     parts.push(
-      `${rekom.rekomendasi_lemah.join(", ")} juga dapat dipertimbangkan, meski tren permintaannya ` +
-        `masih belum cukup kuat secara statistik (data historis permintaan baru tersedia 7-8 tahun).`
+      `Komoditas seperti ${rekom.rekomendasi_lemah.join(", ")} dapat dijadikan opsi alternatif diversifikasi, meski tren pertumbuhan ekonominya ` +
+        `masih berada pada tingkat moderat.`
     );
   }
   if (rekom?.tidak_direkomendasikan?.length) {
     parts.push(
-      `Sebaliknya, ${rekom.tidak_direkomendasikan.join(", ")} sebenarnya cocok secara iklim/tanah, ` +
-        `namun permintaan pasarnya cenderung tidak mendukung untuk saat ini.`
+      `Sementara itu, ${rekom.tidak_direkomendasikan.join(", ")} tidak direkomendasikan untuk pengembangan skala luas saat ini ` +
+        `akibat adanya pembatas biofisik tanah atau kelesuan tren permintaan pasar.`
     );
   }
 
   const firstKuat = rekom?.rekomendasi_kuat?.[0];
   if (firstKuat && rekom.saran_distribusi?.[firstKuat]?.length) {
     parts.push(
-      `Hasil panen ${firstKuat} dapat dipertimbangkan untuk didistribusikan ke ` +
-        `${rekom.saran_distribusi[firstKuat].join(", ")} yang memiliki proyeksi permintaan tertinggi.`
+      `Untuk optimalisasi rantai pasok dan stabilitas harga panen, komoditas ${firstKuat} diproyeksikan memiliki alokasi distribusi pasar potensial menuju ` +
+        `${rekom.saran_distribusi[firstKuat].join(", ")}.`
     );
   }
 

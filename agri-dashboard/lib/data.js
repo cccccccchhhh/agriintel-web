@@ -58,6 +58,8 @@ export function getAllNamaKomoditas() {
   return Array.from(new Set(readJSON("komoditas.json").map((r) => r.komoditas)));
 }
 
+
+
 export function getKomoditasPageData(namaKomoditas) {
   const lurList = readJSON("lur.json");
   const komoditasList = readJSON("komoditas.json");
@@ -83,7 +85,8 @@ export function getKomoditasPageData(namaKomoditas) {
       kode_kab: kab.kode_kab,
       nama_kab: kab.nama_kab,
       provinsi: kab.provinsi,
-      kelas: kab.kelas[namaKomoditas],
+      kelas: kab.kelas?.[namaKomoditas],
+
     }))
     .sort((a, b) => {
       if (a.kelas === b.kelas) return a.nama_kab.localeCompare(b.nama_kab);
@@ -92,3 +95,12 @@ export function getKomoditasPageData(namaKomoditas) {
 
   return { lurRow, trenData, kabupatenCocok };
 }
+
+export function getPermintaanData() {
+  return readJSON("permintaan.json");
+}
+
+export function getOniData() {
+  return readJSON("oni.json");
+}
+

@@ -16,12 +16,10 @@ import {
 import { buatSummary } from "../../lib/summary";
 
 export default function KabupatenPage({ kabupatenList, kab, rekom, forecast }) {
-  const forecastChartType = "line";
-
   if (!kab) {
     return (
       <Layout>
-        <p className="text-center text-gray-400 py-20">Data kabupaten tidak ditemukan.</p>
+        <p className="text-center text-emerald-200/60 py-20 font-bold">Data kabupaten tidak ditemukan.</p>
       </Layout>
     );
   }
@@ -31,7 +29,7 @@ export default function KabupatenPage({ kabupatenList, kab, rekom, forecast }) {
   return (
     <Layout>
       <Head>
-        <title>{kab.nama_kab} — AgriRekomendasi</title>
+        <title>{kab.nama_kab} — AgriDiv</title>
       </Head>
 
       <div className="mb-6">
@@ -39,29 +37,29 @@ export default function KabupatenPage({ kabupatenList, kab, rekom, forecast }) {
       </div>
 
       {/* KABUPATEN HEADER */}
-      <section className="grain border border-[#166534]/10 rounded-3xl bg-white/50 backdrop-blur-sm px-6 py-8 mb-6 animate-fade-in">
+      <section className="grain glass-panel rounded-3xl px-6 py-8 mb-6 animate-fade-in shadow-xl">
         <div className="flex items-start justify-between flex-wrap gap-4">
           <div>
-            <div className="flex items-center gap-2 text-[13px] font-bold text-[#6a8174] mb-2.5">
+            <div className="flex items-center gap-2 text-[13px] font-bold text-emerald-200/70 mb-2">
               <span>📍 Provinsi {kab.provinsi}</span>
               {kab.pulau && (
                 <>
-                  <span className="text-[#166534]/30">•</span>
+                  <span className="text-emerald-500/40">•</span>
                   <span>Pulau {kab.pulau}</span>
                 </>
               )}
             </div>
-            <h1 className="text-[32px] md:text-[36px] font-extrabold tracking-tight text-[#143d27] leading-none">
+            <h1 className="text-[32px] md:text-[42px] font-black tracking-tight text-white leading-none">
               {kab.nama_kab}
             </h1>
-            <p className="text-[14px] text-[#46604f] mt-3 font-semibold">
+            <p className="text-[14px] text-emerald-100/70 mt-3 font-medium">
               Profil agroekologi & kesesuaian lahan · Diperbarui 2026
             </p>
           </div>
           {rekom && (
-            <div className="flex items-center gap-2.5 bg-[#16a34a]/10 border-2 border-[#16a34a]/20 rounded-2xl px-4 py-2.5 animate-pulse-soft">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#16a34a]"></span>
-              <span className="text-[13.5px] font-extrabold text-[#15803d]">
+            <div className="flex items-center gap-2.5 bg-emerald-500/20 border border-emerald-500/30 rounded-2xl px-4 py-2.5 animate-pulse-soft">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#bef264]"></span>
+              <span className="text-[13.5px] font-extrabold text-[#bef264]">
                 {rekom.rekomendasi_kuat?.length ?? 0} komoditas direkomendasikan kuat
               </span>
             </div>
@@ -71,11 +69,11 @@ export default function KabupatenPage({ kabupatenList, kab, rekom, forecast }) {
 
       {/* Section A: Profil Wilayah */}
       <section className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-        <StatCard label="pH Tanah" value={kab.ph ?? "-"} icon="🧪" iconBg="bg-green-50 text-green-700" sub="ideal" />
-        <StatCard label="Elevasi" value={kab.dem != null ? `${kab.dem} mdpl` : "-"} icon="⛰️" iconBg="bg-purple-50 text-purple-700" sub="tinggi" />
-        <StatCard label="Tekstur Tanah" value={kab.tekstur_eng ?? "-"} icon="🪨" iconBg="bg-amber-50 text-amber-700" sub="drainase baik" />
-        <StatCard label="Suhu Rata-rata" value={kab.suhu_mean != null ? `${kab.suhu_mean}°C` : "-"} icon="🌡️" iconBg="bg-red-50 text-red-700" sub="sejuk" />
-        <StatCard label="Curah Hujan/thn" value={kab.ch_tahunan_mm != null ? `${Math.round(kab.ch_tahunan_mm)} mm` : "-"} icon="🌧️" iconBg="bg-blue-50 text-blue-700" sub="stabil" />
+        <StatCard label="pH Tanah" value={kab.ph ?? "-"} icon="🧪" iconBg="bg-emerald-500/20 text-[#bef264] border border-emerald-500/30" sub="ideal" />
+        <StatCard label="Elevasi" value={kab.dem != null ? `${kab.dem} mdpl` : "-"} icon="⛰️" iconBg="bg-purple-500/20 text-purple-300 border border-purple-500/30" sub="tinggi" />
+        <StatCard label="Tekstur Tanah" value={kab.tekstur_eng ?? "-"} icon="🪨" iconBg="bg-amber-500/20 text-amber-300 border border-amber-500/30" sub="drainase baik" />
+        <StatCard label="Suhu Rata-rata" value={kab.suhu_mean != null ? `${kab.suhu_mean}°C` : "-"} icon="🌡️" iconBg="bg-rose-500/20 text-rose-300 border border-rose-500/30" sub="sejuk" />
+        <StatCard label="Curah Hujan/thn" value={kab.ch_tahunan_mm != null ? `${Math.round(kab.ch_tahunan_mm)} mm` : "-"} icon="🌧️" iconBg="bg-sky-500/20 text-sky-300 border border-sky-500/30" sub="stabil" />
       </section>
 
       {/* Section B: Forecast Cuaca */}
@@ -83,30 +81,30 @@ export default function KabupatenPage({ kabupatenList, kab, rekom, forecast }) {
         <section className="mb-10">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
             <div>
-              <h2 className="text-[18px] md:text-[20px] font-extrabold text-[#143d27]">Forecast Cuaca 12 Bulan ke Depan</h2>
-              <p className="text-[13px] text-[#6a8174] mt-1 font-semibold">Visualisasi garis (line chart) memberikan tampilan tren yang lebih jelas dan bersih.</p>
+              <h2 className="text-[18px] md:text-[22px] font-black text-white">Forecast Cuaca 12 Bulan ke Depan</h2>
+              <p className="text-[13px] text-emerald-200/70 mt-1 font-medium">Visualisasi tren iklim musiman berbasis SARIMAX.</p>
             </div>
           </div>
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-white rounded-3xl border border-[#166534]/10 p-5 shadow-sm hover:shadow-md transition-all duration-300">
-              <h3 className="text-[14px] font-extrabold text-[#1a2e22] mb-3">Curah Hujan (mm/bulan)</h3>
+            <div className="glass-panel rounded-3xl p-5 shadow-xl">
+              <h3 className="text-[14px] font-extrabold text-white mb-3">Curah Hujan (mm/bulan)</h3>
               <ForecastChart
                 labels={forecast.label}
                 values={forecast.curah_hujan_mm}
                 name="Curah Hujan"
                 unit="mm"
-                color="#0284c7"
+                color="#38bdf8"
                 chartType="line"
               />
             </div>
-            <div className="bg-white rounded-3xl border border-[#166534]/10 p-5 shadow-sm hover:shadow-md transition-all duration-300">
-              <h3 className="text-[14px] font-extrabold text-[#1a2e22] mb-3">Suhu Rata-rata (°C)</h3>
+            <div className="glass-panel rounded-3xl p-5 shadow-xl">
+              <h3 className="text-[14px] font-extrabold text-white mb-3">Suhu Rata-rata (°C)</h3>
               <ForecastChart
                 labels={forecast.label}
                 values={forecast.suhu_c}
                 name="Suhu"
                 unit="°C"
-                color="#d97706"
+                color="#fbbf24"
                 chartType="line"
               />
             </div>
@@ -116,7 +114,7 @@ export default function KabupatenPage({ kabupatenList, kab, rekom, forecast }) {
 
       {/* Section C: Kesesuaian Lahan */}
       <section className="mb-10">
-        <h2 className="text-[18px] md:text-[20px] font-extrabold mb-4 text-[#143d27]">
+        <h2 className="text-[18px] md:text-[22px] font-black mb-4 text-white">
           Kesesuaian Lahan per Komoditas (S1/S2/N)
         </h2>
         <SuitabilityTable kelas={kab.kelas} />
@@ -125,7 +123,7 @@ export default function KabupatenPage({ kabupatenList, kab, rekom, forecast }) {
       {/* Section D: Rekomendasi */}
       {rekom && (
         <section className="mb-10">
-          <h2 className="text-[18px] md:text-[20px] font-extrabold mb-4 text-[#143d27]">
+          <h2 className="text-[18px] md:text-[22px] font-black mb-4 text-white">
             Rekomendasi Komoditas Tanam
           </h2>
           <div className="grid md:grid-cols-3 gap-4">
@@ -151,19 +149,23 @@ export default function KabupatenPage({ kabupatenList, kab, rekom, forecast }) {
       )}
 
       {/* Section F: Summary Bahasa Manusia */}
-      <section className="mb-10 bg-[#dcfce7] border border-[#16a34a]/25 rounded-3xl p-6 md:p-8 animate-fade-in shadow-sm">
+      <section className="mb-10 bg-gradient-to-r from-[#0c2417] via-[#143d27] to-[#166534] border border-[#bef264]/30 rounded-3xl p-6 md:p-8 animate-fade-in shadow-xl">
         <div className="flex items-center gap-2.5 mb-3.5">
-          <span className="w-8 h-8 rounded-lg bg-[#166534] flex items-center justify-center text-white text-[15px]">💬</span>
-          <h2 className="text-[16px] font-extrabold text-[#143d27]">Ringkasan untuk Petani</h2>
+          <span className="w-8 h-8 rounded-xl bg-[#bef264] flex items-center justify-center text-black text-[15px] font-black">💬</span>
+          <h2 className="text-[18px] font-black text-white">Ringkasan untuk Petani</h2>
         </div>
-        <p className="text-[15.5px] md:text-[16.5px] leading-relaxed text-[#235c38] font-semibold">
+        <p className="text-[15.5px] md:text-[16.5px] leading-relaxed text-[#bef264] font-bold">
           {summary}
         </p>
         <div className="flex flex-wrap gap-3 mt-6">
-          <button className="bg-[#166534] hover:bg-[#12502a] text-white text-[13.5px] font-bold px-5 py-2.5 rounded-xl hover:shadow-sm transition-all duration-300">
-            Unduh Laporan Lengkap
+          <button
+            onClick={() => typeof window !== "undefined" && window.print()}
+            className="bg-gradient-to-r from-[#bef264] to-[#a3e635] hover:brightness-110 text-[#08140c] text-[13.5px] font-black px-5 py-2.5 rounded-xl transition-all duration-300 flex items-center gap-2 shadow-md"
+          >
+            <span>📥 Unduh / Cetak Laporan Lengkap</span>
           </button>
-          <Link href="/compare" className="bg-white border border-[#166534]/20 text-[#166534] text-[13.5px] font-bold px-5 py-2.5 rounded-xl hover:border-[#166534]/40 hover:bg-[#faf9f4] transition-all duration-300 flex items-center justify-center">
+
+          <Link href="/compare" className="glass-card text-emerald-100 border-white/20 text-[13.5px] font-bold px-5 py-2.5 rounded-xl hover:border-[#bef264] hover:text-[#bef264] transition-all duration-300 flex items-center justify-center">
             Bandingkan Wilayah Lain
           </Link>
         </div>

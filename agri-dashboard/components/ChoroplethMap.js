@@ -5,13 +5,8 @@ import { useRouter } from "next/router";
 
 const GEO_URL = "/geo/kabupaten.json";
 
-// Indonesia bounding box: lon 95°–141°, lat -11°–6°
-// ViewBox: 800×400. Center at [118, -2].
-// scale=950 → 46° * π/180 * 950 ≈ 763px (fits in 800)
-// No rotate needed — just center on [118, -2] directly.
 const PROJ_CONFIG = { center: [118, -2], scale: 950 };
 
-// ── Name aliases: nama_kab (UPPERCASE) → GeoJSON WADMKK (UPPERCASE) ───────────
 const ALIAS = {
   "FAKFAK": "FAK FAK",
   "JAKARTA BARAT": "KOTA ADMINISTRASI JAKARTA BARAT",
@@ -29,11 +24,11 @@ const ALIAS = {
   "TOLITOLI": "TOLI TOLI",
 };
 
-// ── Color helpers ─────────────────────────────────────────────────────────────
-const COLOR_MIN  = "#dcfce7"; // green-100 (few komoditas)
-const COLOR_MAX  = "#166534"; // green-800 (many komoditas)
-const COLOR_MISS = "#d1d5db"; // gray-300  (no data)
-const COLOR_HOVER= "#fef08a"; // yellow-200
+// ── Dark Emerald Theme Color helpers ───────────────────────────────────────────
+const COLOR_MIN  = "#113822"; // Dark Moss
+const COLOR_MAX  = "#22c55e"; // Vibrant Emerald
+const COLOR_MISS = "#1f2937"; // Dark grey
+const COLOR_HOVER= "#bef264"; // Neon Lime highlight
 
 function lerpColor(hex1, hex2, t) {
   const p = (h) => [
@@ -52,25 +47,23 @@ function getColor(n, max) {
   return lerpColor(COLOR_MIN, COLOR_MAX, n / max);
 }
 
-// ── Tooltip (fixed to cursor) ─────────────────────────────────────────────────
 function Tooltip({ content, pos }) {
   if (!content) return null;
   return (
     <div
-      className="pointer-events-none fixed z-50 bg-gray-900 text-white text-xs rounded-lg px-3 py-2 shadow-lg"
+      className="pointer-events-none fixed z-50 bg-[#0c2417]/95 text-white text-xs rounded-2xl px-4 py-3 shadow-2xl border border-[#bef264]/40 backdrop-blur-xl"
       style={{ left: pos.x + 14, top: pos.y - 10 }}
     >
-      <div className="font-semibold">{content.nama}</div>
-      <div className="text-gray-300 text-[10px]">{content.provinsi}</div>
+      <div className="font-extrabold text-white text-sm">{content.nama}</div>
+      <div className="text-emerald-200/70 text-[11px] font-medium">{content.provinsi}</div>
       {content.n != null
-        ? <div className="mt-1 text-green-300">{content.n} komoditas cocok</div>
-        : <div className="mt-1 text-gray-400 italic">data tidak tersedia</div>}
+        ? <div className="mt-1.5 text-[#bef264] font-bold">🌱 {content.n} komoditas cocok</div>
+        : <div className="mt-1.5 text-emerald-200/50 italic">data tidak tersedia</div>}
     </div>
   );
 }
 
-// ── Map ───────────────────────────────────────────────────────────────────────
-export default function ChoroplethMap({ kabupatenData }) {
+export default function ChoroplethMap({ kabupatenData = [] }) {
   const router = useRouter();
   const [tooltip, setTooltip]     = useState(null);
   const [tooltipPos, setPos]      = useState({ x: 0, y: 0 });
@@ -78,7 +71,7 @@ export default function ChoroplethMap({ kabupatenData }) {
 
   const kabMap = useMemo(() => {
     const m = {};
-    for (const kab of kabupatenData) {
+    for (const kab of kabupatenData || []) {
       const key = (ALIAS[kab.nama_kab] ?? kab.nama_kab).toUpperCase().trim();
       m[key] = { kode_kab: kab.kode_kab, n: kab.n_komoditas_cocok ?? null, nama: kab.nama_kab, provinsi: kab.provinsi };
     }
@@ -86,13 +79,13 @@ export default function ChoroplethMap({ kabupatenData }) {
   }, [kabupatenData]);
 
   const maxN = useMemo(
-    () => Math.max(1, ...kabupatenData.map((k) => k.n_komoditas_cocok ?? 0)),
+    () => Math.max(1, ...(kabupatenData || []).map((k) => k.n_komoditas_cocok ?? 0)),
     [kabupatenData]
   );
 
   return (
     <div
-      className="relative w-full rounded-xl overflow-hidden border border-gray-200"
+      className="relative w-full rounded-3xl overflow-hidden border border-white/15 shadow-xl glass-card"
       onMouseMove={(e) => setPos({ x: e.clientX, y: e.clientY })}
     >
       <ComposableMap
@@ -102,8 +95,8 @@ export default function ChoroplethMap({ kabupatenData }) {
         height={400}
         style={{ width: "100%", height: "auto" }}
       >
-        {/* Ocean background — SVG <rect>, not CSS background */}
-        <rect width={800} height={400} fill="#bfdbfe" />
+        {/* Ocean background */}
+        <rect width={800} height={400} fill="#06120b" />
 
         <Geographies geography={GEO_URL}>
           {({ geographies }) =>
@@ -118,7 +111,7 @@ export default function ChoroplethMap({ kabupatenData }) {
                   key={geo.rsmKey}
                   geography={geo}
                   fill={fill}
-                  stroke="#fff"
+                  stroke="#08140c"
                   strokeWidth={0.5}
                   style={{ default: { outline: "none" }, hover: { outline: "none" }, pressed: { outline: "none" } }}
                   onMouseEnter={() => {
@@ -131,7 +124,7 @@ export default function ChoroplethMap({ kabupatenData }) {
                   }}
                   onMouseLeave={() => { setHovered(null); setTooltip(null); }}
                   onClick={() => data?.kode_kab && router.push(`/kabupaten/${data.kode_kab}`)}
-                  className={data?.kode_kab ? "cursor-pointer" : "cursor-default"}
+                  className={data?.kode_kab ? "cursor-pointer transition-colors duration-200" : "cursor-default"}
                 />
               );
             })
@@ -142,15 +135,15 @@ export default function ChoroplethMap({ kabupatenData }) {
       <Tooltip content={tooltip} pos={tooltipPos} />
 
       {/* Legend */}
-      <div className="absolute bottom-3 left-3 bg-white/90 rounded-lg px-3 py-2 text-xs shadow">
-        <div className="font-semibold text-gray-600 mb-1">Komoditas Cocok (S1/S2)</div>
-        <div className="flex items-center gap-2">
-          <div className="h-3 w-28 rounded" style={{ background: `linear-gradient(to right, ${COLOR_MIN}, ${COLOR_MAX})` }} />
-          <span className="text-gray-500">0 → {maxN}</span>
+      <div className="absolute bottom-4 left-4 bg-[#0c2417]/90 backdrop-blur-xl rounded-2xl px-4 py-3 text-xs shadow-2xl border border-white/15">
+        <div className="font-bold text-white mb-1.5">Komoditas Cocok (S1/S2)</div>
+        <div className="flex items-center gap-2.5">
+          <div className="h-3 w-28 rounded-full" style={{ background: `linear-gradient(to right, ${COLOR_MIN}, ${COLOR_MAX})` }} />
+          <span className="text-[#bef264] font-mono font-bold">0 → {maxN}</span>
         </div>
-        <div className="flex items-center gap-1 mt-1">
-          <div className="h-3 w-4 rounded" style={{ background: COLOR_MISS }} />
-          <span className="text-gray-400">Data tidak tersedia</span>
+        <div className="flex items-center gap-2 mt-2">
+          <div className="h-2.5 w-3.5 rounded-sm" style={{ background: COLOR_MISS }} />
+          <span className="text-emerald-200/60 text-[11px] font-medium">Data tidak tersedia</span>
         </div>
       </div>
     </div>

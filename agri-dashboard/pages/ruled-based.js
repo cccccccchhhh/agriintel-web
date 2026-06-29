@@ -1,7 +1,6 @@
 // pages/ruled-based.js
 import { useState, useMemo } from "react";
 import Head from "next/head";
-import Link from "next/link";
 import Layout from "../components/Layout";
 import { getKabupatenList, getAllKabupatenLite, getLurList } from "../lib/data";
 import { klasifikasiSemuaKomoditas, TEKSTUR_OPTIONS } from "../lib/classify";
@@ -30,9 +29,9 @@ function getEmoji(nama) {
 
 // ── Kelas styles ───────────────────────────────────────────────────────────────
 const KELAS_STY = {
-  S1: { badge: "bg-[#16a34a]/12 text-[#15803d]", card: "border-[#16a34a]/25 hover:shadow-[0_8px_20px_-8px_rgba(22,163,74,0.25)]", lf: "text-[#3f7553] font-semibold" },
-  S2: { badge: "bg-[#eab308]/15 text-[#a16207]", card: "border-[#eab308]/30 hover:shadow-[0_8px_20px_-8px_rgba(234,179,8,0.25)]", lf: "text-[#8a6d1f] font-semibold" },
-  N:  { badge: "bg-[#dc2626]/10 text-[#b91c1c]", card: "border-[#dc2626]/20", lf: "text-[#9a3b3b] font-semibold" },
+  S1: { badge: "bg-emerald-500/20 text-[#bef264] border border-emerald-500/40 font-extrabold", card: "border-emerald-500/40 hover:border-[#bef264] hover:shadow-xl", lf: "text-[#bef264] font-extrabold" },
+  S2: { badge: "bg-amber-500/20 text-amber-300 border border-amber-500/40 font-extrabold", card: "border-amber-500/40 hover:border-amber-400 hover:shadow-xl", lf: "text-amber-300 font-extrabold" },
+  N:  { badge: "bg-rose-500/20 text-rose-300 border border-rose-500/40 font-extrabold", card: "border-rose-500/40 hover:border-rose-400 hover:shadow-xl", lf: "text-rose-300 font-extrabold" },
 };
 const SORT_ORDER = { S1: 0, S2: 1, N: 2 };
 
@@ -40,9 +39,9 @@ const SORT_ORDER = { S1: 0, S2: 1, N: 2 };
 function InputField({ label, unit, value, onChange, placeholder, type, step, manual }) {
   return (
     <label className="block">
-      <span className="flex items-center justify-between text-[12.5px] font-bold text-[#3c5547] mb-1.5">
+      <span className="flex items-center justify-between text-[12.5px] font-extrabold text-emerald-100 mb-1.5">
         {label}
-        {unit && <span className="text-[11px] font-medium text-[#a7bbae]">{unit}</span>}
+        {unit && <span className="text-[11px] font-medium text-emerald-200/60">{unit}</span>}
       </span>
       <input
         type={type}
@@ -50,13 +49,13 @@ function InputField({ label, unit, value, onChange, placeholder, type, step, man
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className={`w-full rounded-xl px-3.5 py-2.5 text-[14px] font-bold text-[#1a2e22] outline-none transition-all duration-300 border-2 ${
+        className={`w-full rounded-xl px-3.5 py-2.5 text-[14px] font-black text-white outline-none transition-all duration-300 border-2 placeholder:text-emerald-200/40 ${
           manual
-            ? "bg-[#16a34a]/6 border-[#16a34a]/45 focus:border-[#16a34a] focus:ring-2 focus:ring-[#16a34a]/10"
-            : "bg-[#faf7f0] border-transparent focus:border-[#166534]/40"
+            ? "bg-[#22c55e]/20 border-[#bef264] focus:ring-2 focus:ring-[#bef264]/40"
+            : "bg-[#0c2417]/80 border-white/20 focus:border-[#bef264]"
         }`}
       />
-      <span className={`block text-[10.5px] font-bold mt-1 ${manual ? "text-[#15803d]" : "text-[#a7bbae]"}`}>
+      <span className={`block text-[10.5px] font-extrabold mt-1 ${manual ? "text-[#bef264]" : "text-emerald-200/50"}`}>
         {manual ? "● diisi manual" : "default kabupaten"}
       </span>
     </label>
@@ -65,16 +64,16 @@ function InputField({ label, unit, value, onChange, placeholder, type, step, man
 
 function Chip({ icon, label, value, manual }) {
   return (
-    <div className={`inline-flex items-center gap-2.5 bg-white rounded-xl border px-3.5 py-2 transition-all duration-300 hover:shadow-sm ${
-      manual ? "border-[#16a34a]/35" : "border-[#166534]/10"
+    <div className={`inline-flex items-center gap-2.5 glass-card rounded-xl border px-3.5 py-2 transition-all duration-300 ${
+      manual ? "border-[#bef264] text-[#bef264] bg-[#22c55e]/20" : "border-white/15 text-white"
     }`}>
       <span className="text-[15px]">{icon}</span>
       <span>
-        <span className="block text-[11px] font-medium text-[#8a9e92] leading-tight">{label}</span>
-        <span className="block text-[13.5px] font-extrabold text-[#143d27] leading-tight">{value ?? "—"}</span>
+        <span className="block text-[11px] font-medium text-emerald-200/70 leading-tight">{label}</span>
+        <span className="block text-[13.5px] font-black text-white leading-tight">{value ?? "—"}</span>
       </span>
-      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
-        manual ? "bg-[#16a34a]/12 text-[#15803d]" : "bg-[#166534]/6 text-[#8a9e92]"
+      <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${
+        manual ? "bg-[#bef264] text-black" : "bg-white/15 text-emerald-200"
       }`}>
         {manual ? "manual" : "default"}
       </span>
@@ -121,18 +120,18 @@ export default function RuledBasedPage({ kabupatenList, kabupatenData, lurList }
   return (
     <Layout>
       <Head>
-        <title>Cek Lahan Manual — AgriRekomendasi</title>
+        <title>Cek Lahan Manual — AgriDiv</title>
       </Head>
 
       {/* HEADER BANNER */}
-      <section className="grain border border-[#166534]/10 rounded-3xl bg-white/50 backdrop-blur-sm px-6 py-8 mb-6 animate-fade-in">
-        <span className="inline-flex items-center gap-2 text-[12.5px] font-bold text-[#166534] bg-[#22c55e]/12 border border-[#166534]/15 px-3 py-1 rounded-full mb-3.5">
+      <section className="grain relative overflow-hidden rounded-3xl glass-panel px-6 py-8 mb-6 animate-fade-in shadow-xl">
+        <span className="inline-flex items-center gap-2 text-[12.5px] font-extrabold text-[#bef264] bg-[#bef264]/15 border border-[#bef264]/30 px-3.5 py-1 rounded-full mb-3">
           🧭 Mode Manual
         </span>
-        <h1 className="text-[28px] md:text-[32px] font-extrabold tracking-tight text-[#143d27] leading-tight">
+        <h1 className="text-[28px] md:text-[36px] font-black tracking-tight text-white leading-tight">
           Cek Kesesuaian Lahan Manual
         </h1>
-        <p className="text-[14.5px] text-[#46604f] mt-2 max-w-2xl font-medium leading-relaxed">
+        <p className="text-[14.5px] text-emerald-100/80 mt-2 max-w-2xl font-medium leading-relaxed">
           Pilih kabupaten terdekat untuk memuat data default agroekologi secara otomatis, lalu sesuaikan parameter tanah & iklim sesuai kondisi real lahan Anda.
         </p>
       </section>
@@ -141,21 +140,21 @@ export default function RuledBasedPage({ kabupatenList, kabupatenData, lurList }
       <div className="grid lg:grid-cols-[380px_1fr] gap-6 items-start">
         
         {/* INPUT PARAMETERS FORM */}
-        <div className="bg-white rounded-3xl border border-[#166534]/10 p-6 lg:sticky lg:top-20 animate-fade-in-up">
-          <h2 className="text-[16px] font-extrabold text-[#143d27] mb-1">Parameter Lahan Anda</h2>
-          <p className="text-[12.5px] text-[#8a9e92] mb-5 font-semibold">Field berwarna hijau = diisi manual.</p>
+        <div className="glass-panel rounded-3xl p-6 lg:sticky lg:top-20 animate-fade-in-up shadow-xl">
+          <h2 className="text-[16px] font-black text-white mb-1">Parameter Lahan Anda</h2>
+          <p className="text-[12.5px] text-emerald-200/70 mb-5 font-bold">Field bergaris hijau neon = diisi manual.</p>
 
           <div className="space-y-4">
             <label className="block">
-              <span className="block text-[12.5px] font-bold text-[#3c5547] mb-1.5">Pilih Kabupaten Acuan</span>
+              <span className="block text-[12.5px] font-extrabold text-emerald-100 mb-1.5">Pilih Kabupaten Acuan</span>
               <select
                 value={kodeKab}
                 onChange={(e) => setKodeKab(e.target.value)}
-                className="w-full bg-[#faf7f0] border-2 border-transparent rounded-xl px-3.5 py-2.5 text-[14px] font-bold text-[#1a2e22] outline-none focus:border-[#166534]/40 transition cursor-pointer"
+                className="w-full bg-[#0c2417]/90 border-2 border-white/20 rounded-xl px-3.5 py-2.5 text-[14px] font-bold text-white outline-none focus:border-[#bef264] transition cursor-pointer"
               >
-                <option value="">— Pilih kabupaten —</option>
+                <option value="" className="bg-[#0c2417] text-white">— Pilih kabupaten —</option>
                 {kabupatenList.map((k) => (
-                  <option key={k.kode_kab} value={k.kode_kab}>
+                  <option key={k.kode_kab} value={k.kode_kab} className="bg-[#0c2417] text-white">
                     {k.nama_kab} ({k.provinsi})
                   </option>
                 ))}
@@ -186,22 +185,22 @@ export default function RuledBasedPage({ kabupatenList, kabupatenData, lurList }
             </div>
 
             <label className="block">
-              <span className="block text-[12.5px] font-bold text-[#3c5547] mb-1.5">Tekstur Tanah</span>
+              <span className="block text-[12.5px] font-extrabold text-emerald-100 mb-1.5">Tekstur Tanah</span>
               <select
                 value={tekstur}
                 onChange={(e) => setTekstur(e.target.value)}
-                className={`w-full rounded-xl px-3.5 py-2.5 text-[14px] font-bold text-[#1a2e22] outline-none transition-all duration-300 border-2 cursor-pointer appearance-none ${
+                className={`w-full rounded-xl px-3.5 py-2.5 text-[14px] font-bold text-white outline-none transition-all duration-300 border-2 cursor-pointer appearance-none ${
                   m.tekstur
-                    ? "bg-[#16a34a]/6 border-[#16a34a]/45 focus:border-[#16a34a] focus:ring-2 focus:ring-[#16a34a]/10"
-                    : "bg-[#faf7f0] border-transparent focus:border-[#166534]/40 focus:ring-2 focus:ring-[#166534]/10"
+                    ? "bg-[#22c55e]/20 border-[#bef264] focus:ring-2 focus:ring-[#bef264]/40"
+                    : "bg-[#0c2417]/90 border-white/20 focus:border-[#bef264]"
                 }`}
               >
-                <option value="">— Pakai default{kabDefault && !m.tekstur ? ` (${kabDefault.tekstur_eng ?? "—"})` : ""} —</option>
+                <option value="" className="bg-[#0c2417] text-white">— Pakai default{kabDefault && !m.tekstur ? ` (${kabDefault.tekstur_eng ?? "—"})` : ""} —</option>
                 {TEKSTUR_OPTIONS.map((t) => (
-                  <option key={t.value} value={t.value}>{t.label}</option>
+                  <option key={t.value} value={t.value} className="bg-[#0c2417] text-white">{t.label}</option>
                 ))}
               </select>
-              <span className={`block text-[10.5px] font-bold mt-1 ${m.tekstur ? "text-[#15803d]" : "text-[#a7bbae]"}`}>
+              <span className={`block text-[10.5px] font-extrabold mt-1 ${m.tekstur ? "text-[#bef264]" : "text-emerald-200/50"}`}>
                 {m.tekstur ? "● diisi manual" : "default kabupaten"}
               </span>
             </label>
@@ -209,7 +208,7 @@ export default function RuledBasedPage({ kabupatenList, kabupatenData, lurList }
             <button
               type="button"
               onClick={handleReset}
-              className="w-full mt-4 text-[13px] font-bold text-[#166534] border-2 border-[#166534]/15 rounded-xl py-2.5 hover:bg-[#166534]/5 hover:border-[#166534]/30 transition-all duration-200"
+              className="w-full mt-4 text-[13px] font-extrabold text-[#bef264] border border-[#bef264]/40 rounded-xl py-2.5 hover:bg-[#22c55e]/20 transition-all duration-200"
             >
               ↺ Reset Parameter
             </button>
@@ -223,7 +222,7 @@ export default function RuledBasedPage({ kabupatenList, kabupatenData, lurList }
               
               {/* CURRENT WORKING CHIPS */}
               <div className="animate-fade-in">
-                <h2 className="text-[15px] font-extrabold text-[#143d27] mb-3">Indikator Lahan Digunakan</h2>
+                <h2 className="text-[15px] font-black text-white mb-3">Indikator Lahan Digunakan</h2>
                 <div className="flex flex-wrap gap-2.5">
                   <Chip icon="🧪" label="pH Tanah"
                     value={indikatorFinal.ph != null ? String(indikatorFinal.ph) : null}
@@ -246,16 +245,16 @@ export default function RuledBasedPage({ kabupatenList, kabupatenData, lurList }
               {/* CLASSIFICATION RESULTS */}
               <div className="animate-fade-in delay-100">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-                  <h2 className="text-[16px] font-extrabold text-[#143d27]">Kesesuaian Komoditas (FAO/ECOCROP)</h2>
-                  <div className="flex items-center gap-3 text-[11px] font-bold text-[#5a7265]">
-                    <span className="inline-flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-[#16a34a]" />S1 Sangat Sesuai</span>
-                    <span className="inline-flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-[#eab308]" />S2 Cukup Sesuai</span>
-                    <span className="inline-flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-[#dc2626]" />N Tidak Sesuai</span>
+                  <h2 className="text-[16px] font-black text-white">Kesesuaian Komoditas (FAO/ECOCROP)</h2>
+                  <div className="flex items-center gap-3 text-[11px] font-bold text-emerald-200/80">
+                    <span className="inline-flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#bef264]" />S1 Sangat Sesuai</span>
+                    <span className="inline-flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#fbbf24]" />S2 Cukup Sesuai</span>
+                    <span className="inline-flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#f43f5e]" />N Tidak Sesuai</span>
                   </div>
                 </div>
 
                 {hasil.length === 0 ? (
-                  <p className="text-[14px] text-[#8a9e92] font-semibold">
+                  <p className="text-[14px] text-emerald-200/50 font-semibold">
                     Data tidak cukup untuk melakukan kalkulasi.
                   </p>
                 ) : (
@@ -265,15 +264,15 @@ export default function RuledBasedPage({ kabupatenList, kabupatenData, lurList }
                       return (
                         <div
                           key={h.nama_komoditas}
-                          className={`bg-white rounded-2xl border p-4 flex items-start gap-3 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-sm ${sty.card} animate-fade-in-up`}
+                          className={`glass-card rounded-2xl border p-4 flex items-start gap-3 transition-all duration-300 hover:-translate-y-0.5 ${sty.card} animate-fade-in-up`}
                         >
-                          <span className="w-11 h-11 rounded-xl bg-[#166534]/6 flex items-center justify-center text-[20px] shrink-0">
+                          <span className="w-11 h-11 rounded-xl bg-[#22c55e]/20 flex items-center justify-center text-[20px] shrink-0 border border-[#22c55e]/30">
                             {getEmoji(h.nama_komoditas)}
                           </span>
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center justify-between gap-2">
-                              <span className="text-[14.5px] font-bold text-[#1a2e22] truncate">{h.nama_komoditas}</span>
-                              <span className={`shrink-0 text-[11px] font-extrabold px-2.5 py-1 rounded-lg ${sty.badge}`}>
+                              <span className="text-[14.5px] font-black text-white truncate">{h.nama_komoditas}</span>
+                              <span className={`shrink-0 text-[11px] font-black px-2.5 py-1 rounded-lg ${sty.badge}`}>
                                 {h.kelas}
                               </span>
                             </div>
@@ -282,7 +281,7 @@ export default function RuledBasedPage({ kabupatenList, kabupatenData, lurList }
                                 ⚠️ {h.limiting_factors.join(" · ")}
                               </div>
                             ) : (
-                              <div className="text-[11.5px] mt-2 leading-relaxed text-[#3f7553] font-semibold">
+                              <div className="text-[11.5px] mt-2 leading-relaxed text-[#bef264] font-extrabold">
                                 ✓ Semua parameter sesuai
                               </div>
                             )}
@@ -297,10 +296,10 @@ export default function RuledBasedPage({ kabupatenList, kabupatenData, lurList }
             </div>
           ) : (
             /* EMPTY PLACEHOLDER STATE */
-            <div className="flex flex-col items-center justify-center py-20 text-center rounded-3xl border-2 border-dashed border-[#166534]/15 bg-white/40 animate-fade-in">
+            <div className="flex flex-col items-center justify-center py-20 text-center rounded-3xl border-2 border-dashed border-white/20 glass-panel animate-fade-in">
               <div className="text-5xl mb-4 animate-bounce-slow">🌱</div>
-              <p className="font-extrabold text-[#143d27] text-lg mb-1">Silakan Pilih Kabupaten Acuan</p>
-              <p className="text-[13.5px] text-[#8a9e92] font-semibold max-w-sm px-4">
+              <p className="font-black text-white text-lg mb-1">Silakan Pilih Kabupaten Acuan</p>
+              <p className="text-[13.5px] text-emerald-200/70 font-medium max-w-sm px-4">
                 Hasil perhitungan kecocokan jenis tanah & iklim dengan tanaman akan langsung muncul otomatis di sini.
               </p>
             </div>

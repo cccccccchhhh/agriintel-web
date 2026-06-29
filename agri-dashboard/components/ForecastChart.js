@@ -1,9 +1,11 @@
 // components/ForecastChart.js
 import { AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
-export default function ForecastChart({ labels, values, name, unit, color = "#16a34a", chartType = "area" }) {
-  const data = labels.map((label, index) => ({ bulan: label, value: values?.[index] ?? null }));
-  const gradientId = `colorGrad_${name.replace(/\W+/g, "")}`;
+export default function ForecastChart({ labels = [], values = [], name = "Forecast", unit = "", color = "#22c55e", chartType = "area" }) {
+  const safeLabels = labels || [];
+  const safeValues = values || [];
+  const data = safeLabels.map((label, index) => ({ bulan: label, value: safeValues[index] ?? null }));
+  const gradientId = `colorGrad_${(name || "chart").replace(/\W+/g, "")}`;
 
   const commonProps = {
     data,
@@ -25,7 +27,7 @@ export default function ForecastChart({ labels, values, name, unit, color = "#16
     <>
       <defs>
         <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="8%" stopColor={color} stopOpacity={0.25} />
+          <stop offset="8%" stopColor={color} stopOpacity={0.35} />
           <stop offset="95%" stopColor={color} stopOpacity={0.02} />
         </linearGradient>
       </defs>
@@ -48,33 +50,33 @@ export default function ForecastChart({ labels, values, name, unit, color = "#16
   return (
     <ResponsiveContainer width="100%" height={240}>
       <ChartComponent {...commonProps}>
-        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#166534" strokeOpacity={0.08} />
+        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.15)" />
         <XAxis
           dataKey="bulan"
           fontSize={10}
           tickLine={false}
           axisLine={false}
-          tick={{ fill: "#6a8174", fontWeight: 600 }}
+          tick={{ fill: "#a7f3d0", fontWeight: 700 }}
           dy={8}
         />
         <YAxis
           fontSize={10}
           tickLine={false}
           axisLine={false}
-          tick={{ fill: "#6a8174", fontWeight: 600 }}
+          tick={{ fill: "#a7f3d0", fontWeight: 700 }}
           unit={` ${unit}`}
           dx={-4}
         />
         <Tooltip
           contentStyle={{
-            backgroundColor: "#ffffff",
-            border: "1px solid rgba(22,101,52,0.12)",
-            borderRadius: "14px",
-            boxShadow: "0 14px 35px -16px rgba(22,101,52,0.18)",
+            backgroundColor: "#0c2417",
+            border: "1px solid rgba(190,242,100,0.4)",
+            borderRadius: "16px",
+            boxShadow: "0 14px 35px rgba(0,0,0,0.5)",
             fontFamily: "inherit",
           }}
-          labelStyle={{ color: "#143d27", fontWeight: 800, fontSize: "11px", marginBottom: "4px" }}
-          itemStyle={{ color: color, fontWeight: 700, fontSize: "12px", padding: 0 }}
+          labelStyle={{ color: "#ffffff", fontWeight: 800, fontSize: "11px", marginBottom: "4px" }}
+          itemStyle={{ color: "#bef264", fontWeight: 700, fontSize: "12px", padding: 0 }}
           formatter={(v) => [`${v} ${unit}`, name]}
         />
         {chartBody}
