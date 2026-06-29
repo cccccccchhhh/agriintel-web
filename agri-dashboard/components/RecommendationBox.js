@@ -46,7 +46,7 @@ const STYLE = {
     noteCls: "text-[#9a3b3b]",
     title: "Tidak Mendukung",
     icon: "✕",
-    note: "Iklim dan karakter lahan tidak sesuai atau demand pasar sangat lemah. Sebaiknya dihindari."
+    note: "Iklim dan karakter lahan tidak sesuai atau demand pasar melemah. Sebaiknya dihindari."
   }
 };
 
@@ -55,38 +55,38 @@ export default function RecommendationBox({ type, items, distribusi, description
   if (!items || items.length === 0) return null;
 
   return (
-    <div className={`rounded-2xl border p-5 transition-all duration-300 hover:shadow-sm animate-fade-in-up ${s.boxCls}`}>
-      <div className="flex items-center gap-2.5 mb-4">
-        <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-[14px] font-extrabold ${s.iconCls}`}>
+    <div className={`rounded-3xl border p-5 transition-all duration-300 hover:shadow-[0_18px_45px_-28px_rgba(22,101,52,0.28)] animate-fade-in-up ${s.boxCls}`}>
+      <div className="flex items-center gap-3 mb-4">
+        <span className={`w-9 h-9 rounded-2xl flex items-center justify-center text-[15px] font-extrabold ${s.iconCls}`}>
           {s.icon}
         </span>
-        <h3 className={`text-[15px] font-extrabold ${s.titleCls}`}>
+        <h3 className={`text-[16px] font-extrabold ${s.titleCls}`}>
           {s.title}
         </h3>
       </div>
-      
+
       <ul className="space-y-3 pl-1">
         {items.map((kom) => (
-          <li key={kom} className="flex flex-col text-[14px] font-bold text-[#1a2e22]">
+          <li key={kom} className="flex flex-col gap-1 text-[14px] font-semibold text-[#1a2e22]">
             <div className="flex items-center gap-2">
               <span className="text-[16px] shrink-0">{getEmoji(kom)}</span>
               <span>{kom}</span>
             </div>
             {descriptions?.[type] && (
-              <p className="text-[11px] text-gray-500 font-semibold mt-0.5 ml-6">
+              <p className="text-[11px] text-[#4b5563] ml-6 leading-snug">
                 {descriptions[type]}
               </p>
             )}
             {distribusi && distribusi[kom] && distribusi[kom].length > 0 && (
-              <p className="text-[11px] text-[#4b5563] font-semibold mt-0.5 ml-6">
+              <p className="text-[11px] text-[#4b5563] ml-6 leading-snug">
                 📍 Sentra distribusi: <span className="font-bold text-[#1f2937]">{distribusi[kom].join(", ")}</span>
               </p>
             )}
           </li>
         ))}
       </ul>
-      
-      <p className={`text-[12px] mt-4 leading-relaxed font-semibold ${s.noteCls}`}>
+
+      <p className={`text-[12px] mt-5 leading-relaxed font-semibold ${s.noteCls}`}>
         {s.note}
       </p>
     </div>

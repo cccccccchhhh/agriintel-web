@@ -1,5 +1,6 @@
 // pages/kabupaten/[kode].js
 import Head from "next/head";
+import Link from "next/link";
 import Layout from "../../components/Layout";
 import SearchBar from "../../components/SearchBar";
 import StatCard from "../../components/StatCard";

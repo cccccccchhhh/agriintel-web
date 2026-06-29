@@ -21,7 +21,6 @@ export default function SearchBar({ kabupatenList, autoFocus = false, showChips 
   const router = useRouter();
   const boxRef = useRef(null);
 
-  // Close suggestions dropdown when clicking outside
   useEffect(() => {
     function onClickOutside(e) {
       if (boxRef.current && !boxRef.current.contains(e.target)) setOpen(false);
@@ -30,26 +29,16 @@ export default function SearchBar({ kabupatenList, autoFocus = false, showChips 
     return () => document.removeEventListener("mousedown", onClickOutside);
   }, []);
 
-  // Compute matched suggestions (both kabupaten and commodities)
   const suggestions = useMemo(() => {
     if (!query.trim()) return [];
     const q = query.toLowerCase();
 
-    // Filter commodities
-    const matchedComms = COMMODITIES.filter((c) =>
-      c.name.toLowerCase().includes(q)
-    );
-
-    // Filter kabupaten
-    const matchedKabs = kabupatenList
-      .filter(
-        (k) =>
-          k.nama_kab.toLowerCase().includes(q) ||
-          (k.provinsi && k.provinsi.toLowerCase().includes(q))
-      )
+    const matchedComms = COMMODITIES.filter((c) => c.name.toLowerCase().includes(q));
+    const matchedKabs = (kabupatenList || [])
+      .filter((k) => k.nama_kab.toLowerCase().includes(q) || (k.provinsi && k.provinsi.toLowerCase().includes(q)))
       .map((k) => ({
         name: k.nama_kab,
-        meta: k.provinsi,
+        meta: k.provinsi || "Kabupaten/Kota",
         kind: "Wilayah",
         icon: "📍",
         iconBg: "bg-[#22c55e]/15 text-[#166534]",
@@ -75,17 +64,15 @@ export default function SearchBar({ kabupatenList, autoFocus = false, showChips 
     }
   };
 
-  // Static chips definitions
   const chips = [
     { label: "Garut", search: "Garut" },
     { label: "Padi", search: "Padi" },
-    { label: "Cabai Merah", search: "Cabai" },
+    { label: "Cabai Merah", search: "Cabai Merah" },
     { label: "Bandung", search: "Bandung" },
   ];
 
   return (
     <div ref={boxRef} className="relative w-full max-w-xl mx-auto text-left z-30">
-      {/* Search Input Bar */}
       <div className="flex items-center gap-3 bg-white rounded-2xl border-2 border-[#166534]/15 shadow-[0_8px_30px_-12px_rgba(22,101,52,0.25)] focus-within:border-[#166534]/45 focus-within:shadow-[0_8px_30px_-8px_rgba(22,101,52,0.35)] transition-all duration-300 px-4 py-2.5">
         <span className="text-[#9bb0a3] text-[18px]">🔍</span>
         <input
@@ -100,16 +87,16 @@ export default function SearchBar({ kabupatenList, autoFocus = false, showChips 
           className="flex-1 bg-transparent outline-none text-[15px] py-1.5 placeholder:text-[#a7bbae] text-[#1a2e22] font-medium"
         />
         <button
+          type="button"
           onClick={handleSearchClick}
-          className="shrink-0 bg-[#166534] hover:bg-[#12502a] text-white text-[14px] font-bold px-5 py-2.5 rounded-xl hover:shadow-sm transition-all duration-300"
+          className="shrink-0 bg-[#166534] hover:bg-[#12502a] text-white text-[14px] font-semibold px-5 py-2.5 rounded-xl hover:shadow-sm transition-all duration-300"
         >
           Cari
         </button>
       </div>
 
-      {/* Suggestions Dropdown */}
       {open && query.trim() && (
-        <div className="absolute left-0 right-0 mt-2 bg-white rounded-2xl border border-[#166534]/12 shadow-[0_20px_50px_-15px_rgba(22,101,52,0.3)] overflow-hidden z-40 animate-fade-in">
+        <div className="absolute left-0 right-0 mt-2 bg-white rounded-2xl border border-[#166534]/12 shadow-[0_20px_50px_-15px_rgba(22,101,52,0.3)] overflow-hidden z-40 animate-fade-in-up">
           {suggestions.length > 0 ? (
             suggestions.map((s, idx) => (
               <button
@@ -117,12 +104,12 @@ export default function SearchBar({ kabupatenList, autoFocus = false, showChips 
                 onMouseDown={() => handlePick(s)}
                 className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#f3f8f4] transition text-left border-b border-[#166534]/6 last:border-0"
               >
-                <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-[15px] ${s.iconBg}`}>
+                <span className={`w-9 h-9 rounded-xl flex items-center justify-center text-[15px] ${s.iconBg}`}>
                   {s.icon}
                 </span>
-                <span className="flex-1">
-                  <span className="block text-[14px] font-bold text-[#1a2e22]">{s.name}</span>
-                  <span className="block text-[12px] text-[#7d9387] font-medium">{s.meta}</span>
+                <span className="flex-1 min-w-0">
+                  <span className="block text-[14px] font-semibold text-[#1a2e22] truncate">{s.name}</span>
+                  <span className="block text-[12px] text-[#7d9387] font-medium truncate">{s.meta}</span>
                 </span>
                 <span className="text-[11px] font-bold text-[#a7bbae] uppercase tracking-wider">{s.kind}</span>
               </button>
@@ -136,12 +123,12 @@ export default function SearchBar({ kabupatenList, autoFocus = false, showChips 
         </div>
       )}
 
-      {/* Quick Chips Selection */}
       {showChips && (
         <div className="flex flex-wrap gap-2 mt-4 justify-center animate-fade-in delay-100">
           {chips.map((c, i) => (
             <button
               key={i}
+              type="button"
               onClick={() => {
                 setQuery(c.search);
                 setOpen(true);

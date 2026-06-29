@@ -5,35 +5,48 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+    background-color: #faf7f0;
+  }
   body {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     background-color: #faf7f0;
     color: #1a2e22;
     margin: 0;
+    min-height: 100vh;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+  * {
+    box-sizing: border-box;
   }
 }
 
 .grain {
-  background-image: radial-gradient(rgba(22, 101, 52, 0.05) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(22,101,52,0.05) 1px, transparent 1px);
   background-size: 22px 22px;
+}
+
+.glass-panel {
+  background: rgba(255,255,255,0.90);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(22,101,52,0.12);
 }
 
 .badge {
   display: inline-flex;
   align-items: center;
-  padding: 0.15rem 0.6rem;
+  padding: 0.28rem 0.75rem;
   border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 600;
 }
 
-/* Animations */
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(18px);
   }
   to {
     opacity: 1;
@@ -42,45 +55,51 @@
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes pulseSoft {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.03);
-    opacity: 0.95;
-  }
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.03); opacity: 0.94; }
+}
+
+@keyframes bounceSlow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 0 rgba(22,163,74,0.12); }
+  50% { box-shadow: 0 0 26px rgba(22,163,74,0.15); }
 }
 
 .animate-fade-in-up {
-  animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.4s ease-out forwards;
+  animation: fadeIn 0.45s ease-out forwards;
 }
 
 .animate-pulse-soft {
-  animation: pulseSoft 2s infinite ease-in-out;
+  animation: pulseSoft 2.4s infinite ease-in-out;
 }
 
-/* Delay helpers */
+.animate-bounce-slow {
+  animation: bounceSlow 4s infinite ease-in-out;
+}
+
+.animate-glow-pulse {
+  animation: glowPulse 2.6s infinite ease-in-out;
+}
+
 .delay-100 { animation-delay: 100ms; }
 .delay-200 { animation-delay: 200ms; }
 .delay-300 { animation-delay: 300ms; }
 .delay-400 { animation-delay: 400ms; }
 .delay-500 { animation-delay: 500ms; }
 
-/* Hide spin buttons for numeric inputs */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;

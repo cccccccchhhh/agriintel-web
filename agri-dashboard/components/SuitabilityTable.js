@@ -52,17 +52,17 @@ function getCommMeta(name) {
 
 const CLS_THEME = {
   S1: {
-    border: "border-[#16a34a]/25 hover:border-[#16a34a]/50 hover:shadow-[0_8px_20px_-8px_rgba(22,163,74,0.25)]",
+    border: "border-[#16a34a]/25 hover:border-[#16a34a]/50 hover:shadow-[0_8px_24px_-12px_rgba(22,163,74,0.24)]",
     badge: "bg-[#16a34a]/12 text-[#15803d]",
     label: "S1"
   },
   S2: {
-    border: "border-[#eab308]/30 hover:border-[#eab308]/60 hover:shadow-[0_8px_20px_-8px_rgba(234,179,8,0.25)]",
+    border: "border-[#eab308]/30 hover:border-[#eab308]/60 hover:shadow-[0_8px_24px_-12px_rgba(234,179,8,0.24)]",
     badge: "bg-[#eab308]/15 text-[#a16207]",
     label: "S2"
   },
   N: {
-    border: "border-[#dc2626]/20 hover:border-[#dc2626]/40",
+    border: "border-[#dc2626]/20 hover:border-[#dc2626]/40 hover:shadow-[0_8px_24px_-12px_rgba(220,38,38,0.18)]",
     badge: "bg-[#dc2626]/10 text-[#b91c1c]",
     label: "N"
   }
@@ -71,7 +71,7 @@ const CLS_THEME = {
 export default function SuitabilityTable({ kelas }) {
   const [filter, setFilter] = useState("ALL");
 
-  const entries = Object.entries(kelas).sort((a, b) => {
+  const entries = Object.entries(kelas || {}).sort((a, b) => {
     const order = { S1: 0, S2: 1, N: 2 };
     return order[a[1]] - order[b[1]];
   });
@@ -87,8 +87,7 @@ export default function SuitabilityTable({ kelas }) {
 
   return (
     <div className="space-y-6">
-      {/* FILTER BUTTONS */}
-      <div className="flex flex-wrap gap-2 animate-fade-in">
+      <div className="flex flex-wrap gap-2 animate-fade-in-up">
         {[
           { key: "ALL", label: "Semua Komoditas" },
           { key: "S1", label: "Sangat Sesuai (S1)" },
@@ -98,14 +97,13 @@ export default function SuitabilityTable({ kelas }) {
           <button
             key={f.key}
             onClick={() => setFilter(f.key)}
-            className={`text-[12.5px] font-bold px-4 py-2 rounded-xl transition-all duration-300 ${getFilterStyle(f.key)}`}
+            className={`text-[12.5px] font-bold px-4 py-2 rounded-2xl transition-all duration-300 ${getFilterStyle(f.key)}`}
           >
             {f.label}
           </button>
         ))}
       </div>
 
-      {/* CARD GRID */}
       {filtered.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {filtered.map(([kom, k]) => {
@@ -115,18 +113,18 @@ export default function SuitabilityTable({ kelas }) {
               <Link
                 key={kom}
                 href={`/komoditas/${encodeURIComponent(kom)}`}
-                className={`bg-white rounded-2xl border p-4 flex items-center justify-between gap-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-md cursor-pointer ${style.border} animate-fade-in-up`}
+                className={`bg-white rounded-3xl border p-4 flex items-center justify-between gap-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer ${style.border} animate-fade-in-up`}
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <span className="w-10 h-10 rounded-xl bg-[#166534]/6 flex items-center justify-center text-[18px] shrink-0">
+                  <span className="w-11 h-11 rounded-2xl bg-[#166534]/6 flex items-center justify-center text-[18px] shrink-0">
                     {meta.emoji}
                   </span>
                   <div className="min-w-0">
                     <div className="text-[14px] font-extrabold text-[#1a2e22] truncate">{kom}</div>
-                    <div className="text-[11px] text-[#8a9e92] font-semibold">{meta.type}</div>
+                    <div className="text-[11.5px] text-[#8a9e92] font-semibold">{meta.type}</div>
                   </div>
                 </div>
-                <span className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-[13px] font-extrabold transition-all duration-200 ${style.badge}`}>
+                <span className={`shrink-0 rounded-2xl px-3 py-2 text-[13px] font-extrabold ${style.badge}`}>
                   {style.label}
                 </span>
               </Link>
@@ -134,7 +132,7 @@ export default function SuitabilityTable({ kelas }) {
           })}
         </div>
       ) : (
-        <div className="text-center py-10 bg-white rounded-2xl border border-dashed border-[#166534]/15 animate-fade-in">
+        <div className="text-center py-10 bg-white rounded-3xl border border-dashed border-[#166534]/15 animate-fade-in-up">
           <p className="text-sm text-gray-500 font-semibold">Tidak ada komoditas pada kategori ini.</p>
         </div>
       )}

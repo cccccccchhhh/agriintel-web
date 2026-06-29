@@ -7,6 +7,39 @@ import StatCard from "../../components/StatCard";
 import { getAllNamaKomoditas, getKomoditasPageData } from "../../lib/data";
 import { TREN_LABEL, KELAS_LABEL } from "../../lib/constants";
 
+const EMOJI_MAP = {
+  padi: "🌾",
+  jagung: "🌽",
+  bawang: "🧅",
+  tomat: "🍅",
+  wortel: "🥕",
+  sawi: "🥬",
+  bayam: "🥬",
+  kubis: "🥬",
+  kacang: "🥜",
+  cabe: "🌶️",
+  durian: "🍈",
+  mangga: "🥭",
+  pepaya: "🍈",
+  pisang: "🍌",
+  terong: "🍆",
+  melon: "🍈",
+  ubi: "🍠",
+  kangkung: "🥬",
+  kedelai: "🫘",
+  kelapa: "🥥",
+  kopi: "☕",
+  teh: "🍵",
+};
+
+function getEmoji(name) {
+  const lower = name.toLowerCase();
+  for (const [key, emoji] of Object.entries(EMOJI_MAP)) {
+    if (lower.includes(key)) return emoji;
+  }
+  return "🌱";
+}
+
 // ── Range Bar ──────────────────────────────────────────────────────────────────
 // Renders a horizontal bar showing [abs_min … opt_min … opt_max … abs_max] on a
 // fixed domain. Absolute range is light-coloured, optimal range is darker.
