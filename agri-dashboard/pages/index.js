@@ -9,6 +9,26 @@ import { useState, useMemo } from "react";
 import { getKabupatenList, getKomoditasList, getStats, getAllNamaKomoditas, getAllRekomendasi } from "../lib/data";
 import { TREN_LABEL } from "../lib/constants";
 
+const EMOJI_MAP = {
+  padi: "🌾", jagung: "🌽", kedelai: "🫘", "kacang tanah": "🥜",
+  "kacang hijau": "🫘", ubi: "🍠", tebu: "🎋", "kelapa sawit": "🌴",
+  kelapa: "🥥", karet: "🌿", kakao: "🍫", kopi: "☕", teh: "🍵",
+  pisang: "🍌", mangga: "🥭", nanas: "🍍", pepaya: "🍈",
+  durian: "🍈", cabai: "🌶️", bawang: "🧅", tomat: "🍅",
+  kentang: "🥔", wortel: "🥕", sawi: "🥬", bayam: "🥬",
+  semangka: "🍉", melon: "🍈", lada: "🌶️", cengkeh: "🌸",
+  pala: "🌰", vanili: "🌿", jahe: "🫚", kunyit: "🫚",
+  kapas: "🪴", tembakau: "🍃",
+};
+
+function getEmoji(name) {
+  const lower = name.toLowerCase();
+  for (const [k, v] of Object.entries(EMOJI_MAP)) {
+    if (lower.includes(k)) return v;
+  }
+  return "🌱";
+}
+
 export default function Home({ kabupatenList, komoditasList, stats, namaKomoditasMap }) {
   const [provinsi, setProvinsi] = useState("");
   const sortedKomoditas = [...komoditasList].sort((a, b) => b.slope - a.slope);
@@ -39,94 +59,131 @@ export default function Home({ kabupatenList, komoditasList, stats, namaKomodita
         <title>AgriRekomendasi — Rekomendasi Tanam Berbasis Data</title>
       </Head>
 
-      <section className="text-center py-8">
-        <h1 className="text-3xl font-bold mb-2 text-green-900">
-          Rekomendasi Komoditas Tanam untuk Petani Indonesia
+      {/* HERO SECTION */}
+      <section className="grain relative overflow-hidden rounded-3xl border border-[#166534]/10 bg-white/50 backdrop-blur-sm px-6 py-12 md:py-16 text-center mb-8 animate-fade-in">
+        <span className="inline-flex items-center gap-2 text-[12.5px] font-bold text-[#166534] bg-[#22c55e]/12 border border-[#166534]/15 px-4 py-1.5 rounded-full mb-6">
+          <span className="w-2 h-2 rounded-full bg-[#22c55e] animate-pulse"></span>
+          Data terkini · {stats.n_kabupaten_total} kabupaten/kota
+        </span>
+        <h1 className="text-[36px] md:text-[48px] leading-[1.1] font-extrabold tracking-tight text-[#143d27] max-w-3xl mx-auto">
+          Rekomendasi Komoditas Tanam<br />
+          untuk <span className="text-[#166534] relative">Petani Indonesia<span className="absolute left-0 -bottom-1 w-full h-[6px] bg-[#22c55e]/30 rounded-full -z-10"></span></span>
         </h1>
-        <p className="text-gray-500 mb-6 max-w-2xl mx-auto">
-          Cari kabupaten/kota kamu untuk melihat rekomendasi komoditas tanam berdasarkan forecast
-          cuaca, kesesuaian lahan (FAO/ECOCROP), dan tren permintaan pasar nasional.
+        <p className="mt-5 text-[15px] md:text-[16px] leading-relaxed text-[#46604f] max-w-xl mx-auto font-medium">
+          Cari tahu komoditas paling cocok untuk wilayahmu berdasarkan data iklim, kesesuaian tanah, dan tren harga pasar nasional.
         </p>
-        <div className="flex flex-col items-center gap-3">
-          <select
-            value={provinsi}
-            onChange={(e) => setProvinsi(e.target.value)}
-            className="w-full max-w-xl border border-gray-300 rounded-lg px-4 py-2.5 text-sm bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-600 text-gray-700"
-          >
-            <option value="">Semua Provinsi</option>
-            {provinsiList.map((p) => (
-              <option key={p} value={p}>{p}</option>
-            ))}
-          </select>
-          <SearchBar kabupatenList={filteredKabupaten} autoFocus />
+
+        {/* SEARCH BAR & FILTER PROVINSI */}
+        <div className="mt-8 max-w-xl mx-auto space-y-4">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <select
+              value={provinsi}
+              onChange={(e) => setProvinsi(e.target.value)}
+              className="w-full sm:w-48 bg-white border-2 border-[#166534]/15 rounded-xl px-4 py-2.5 text-[14px] font-bold text-[#1a2e22] outline-none focus:border-[#166534]/45 focus:ring-1 focus:ring-[#166534]/40 transition cursor-pointer shadow-sm"
+            >
+              <option value="">Semua Provinsi</option>
+              {provinsiList.map((p) => (
+                <option key={p} value={p}>{p}</option>
+              ))}
+            </select>
+            <div className="flex-1">
+              <SearchBar kabupatenList={filteredKabupaten} autoFocus showChips={true} />
+            </div>
+          </div>
+          {provinsi && (
+            <p className="text-[12.5px] text-[#166534] font-bold animate-fade-in">
+              📍 Menampilkan <strong>{filteredKabupaten.length}</strong> kabupaten/kota di <strong>{provinsi}</strong>.{" "}
+              <button onClick={() => setProvinsi("")} className="underline text-[#8a9e92] hover:text-[#166534] ml-1">
+                Reset Filter
+              </button>
+            </p>
+          )}
         </div>
-        {provinsi && (
-          <p className="text-sm text-green-700 mt-3">
-            Menampilkan <strong>{filteredKabupaten.length}</strong> kabupaten/kota di{" "}
-            <strong>{provinsi}</strong>.{" "}
-            <button onClick={() => setProvinsi("")} className="underline text-gray-500">
-              Reset
-            </button>
-          </p>
-        )}
       </section>
 
-      <section className="grid grid-cols-2 md:grid-cols-4 gap-4 my-8">
+      {/* STAT CARDS SECTION */}
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
         <StatCard
           label={provinsi ? "Kab/Kota di Provinsi Ini" : "Kabupaten/Kota Dianalisis"}
           value={displayStats.n_kabupaten_total}
+          icon="📍"
+          iconBg="bg-[#22c55e]/15 text-[#166534]"
         />
         <StatCard
           label="Rekomendasi Kuat"
           value={displayStats.n_kabupaten_rekomendasi_kuat}
-          sub="kabupaten punya ≥1 komoditas"
+          sub="kabupaten dengan ≥1 komoditas kuat"
           color="#16a34a"
+          icon="✅"
+          iconBg="bg-[#16a34a]/12 text-[#16a34a]"
         />
         <StatCard
           label="Rekomendasi Lemah"
           value={displayStats.n_kabupaten_rekomendasi_lemah}
-          sub="kabupaten punya ≥1 komoditas"
+          sub="kabupaten dengan ≥1 komoditas lemah"
           color="#ca8a04"
+          icon="⚠️"
+          iconBg="bg-[#eab308]/15 text-[#ca8a04]"
         />
-        <StatCard label="Komoditas Dianalisis" value={displayStats.n_komoditas} color="#0369a1" />
+        <StatCard
+          label="Komoditas Dianalisis"
+          value={displayStats.n_komoditas}
+          color="#0369a1"
+          icon="🌾"
+          iconBg="bg-[#0369a1]/10 text-[#0369a1]"
+        />
       </section>
 
-      <section className="my-10">
-        <h2 className="text-xl font-semibold mb-3 text-green-900">Tren Permintaan Nasional per Komoditas</h2>
-        <p className="text-sm text-gray-500 mb-4">
-          Diurutkan dari tren kenaikan tercepat. Klasifikasi tren berdasarkan confidence interval
-          95% dari slope regresi (lihat catatan metodologi).
-        </p>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm bg-white rounded-xl shadow-sm overflow-hidden">
-            <thead className="bg-gray-50 text-gray-500 text-left">
-              <tr>
-                <th className="px-4 py-2">Komoditas</th>
-                <th className="px-4 py-2">Tren</th>
-                <th className="px-4 py-2">Slope (per tahun)</th>
-                <th className="px-4 py-2">Model</th>
+      {/* COMMODITY TRENDS TABLE */}
+      <section className="bg-white rounded-3xl border border-[#166534]/10 overflow-hidden shadow-sm p-6 mb-10 animate-fade-in delay-100">
+        <div className="mb-5">
+          <h2 className="text-[20px] font-extrabold text-[#143d27]">Tren Permintaan Nasional per Komoditas</h2>
+          <p className="text-[13px] text-[#6a8174] mt-1 font-semibold">
+            Klasifikasi berdasarkan slope regresi tren harga pasar nasional tahunan (confidence interval 95%).
+          </p>
+        </div>
+
+        <div className="overflow-x-auto rounded-2xl border border-[#166534]/8">
+          <table className="w-full text-left border-collapse min-w-[600px]">
+            <thead>
+              <tr className="bg-[#f3f8f4] text-[#5a7265] text-[12px] font-bold uppercase tracking-wider">
+                <th className="px-5 py-3.5">Komoditas</th>
+                <th className="px-5 py-3.5">Tren Harga</th>
+                <th className="px-5 py-3.5">Slope Kenaikan</th>
+                <th className="px-5 py-3.5">Model Forecasting</th>
               </tr>
             </thead>
             <tbody>
-              {sortedKomoditas.map((k) => (
-                <tr key={k.komoditas} className="border-t border-gray-100">
-                  <td className="px-4 py-2 font-medium">
+              {sortedKomoditas.map((k, idx) => (
+                <tr key={k.komoditas} className="border-t border-[#166534]/6 hover:bg-[#faf9f4]/60 transition-colors duration-150">
+                  <td className="px-5 py-4 font-bold text-[14.5px] text-[#1a2e22]">
                     {namaKomoditasMap[k.komoditas] ? (
                       <Link
                         href={`/komoditas/${encodeURIComponent(namaKomoditasMap[k.komoditas])}`}
-                        className="text-green-700 hover:underline"
+                        className="flex items-center gap-2 text-[#166534] hover:underline"
                       >
-                        {k.komoditas}
+                        <span className="text-[16px]">{getEmoji(k.komoditas)}</span>
+                        <span>{k.komoditas}</span>
                       </Link>
                     ) : (
-                      k.komoditas
+                      <span className="flex items-center gap-2">
+                        <span className="text-[16px]">{getEmoji(k.komoditas)}</span>
+                        <span>{k.komoditas}</span>
+                      </span>
                     )}
                   </td>
-                  <td className="px-4 py-2">
-                    <Badge text={TREN_LABEL[k.tren]?.label || k.tren} color={TREN_LABEL[k.tren]?.color || "#6b7280"} />
+                  <td className="px-5 py-4">
+                    <Badge
+                      text={TREN_LABEL[k.tren]?.label || k.tren}
+                      color={TREN_LABEL[k.tren]?.color || "#6b7280"}
+                    />
                   </td>
-                  <td className="px-4 py-2 text-gray-600">{k.slope > 0 ? "+" : ""}{(k.slope * 100).toFixed(2)}%</td>
-                  <td className="px-4 py-2 text-gray-400 text-xs">{k.model_type}</td>
+                  <td className="px-5 py-4 font-extrabold text-[14px] text-gray-700 tabular-nums">
+                    {k.slope > 0 ? "+" : ""}{(k.slope * 100).toFixed(2)}% <span className="text-[11px] font-medium text-gray-400">/thn</span>
+                  </td>
+                  <td className="px-5 py-4 text-gray-400 text-xs font-bold uppercase tracking-wider">
+                    {k.model_type}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -134,14 +191,24 @@ export default function Home({ kabupatenList, komoditasList, stats, namaKomodita
         </div>
       </section>
 
-      <section className="text-center my-10">
-        <p className="text-gray-500 mb-3">Sudah ukur sendiri kondisi lahan kamu?</p>
-        <Link
-          href="/ruled-based"
-          className="inline-block bg-green-700 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-800"
-        >
-          Coba Cek Manual →
-        </Link>
+      {/* CALL TO ACTION BANNER */}
+      <section className="relative overflow-hidden rounded-3xl bg-[#166534] px-8 py-12 md:py-14 text-center shadow-[0_12px_40px_-15px_rgba(22,101,52,0.4)] animate-fade-in delay-200 mb-6">
+        <div className="grain absolute inset-0 opacity-15"></div>
+        <div className="relative z-10">
+          <h3 className="text-[26px] md:text-[32px] font-extrabold tracking-tight text-white leading-tight">
+            Punya lahan sendiri tapi bingung mau ditanami apa?
+          </h3>
+          <p className="text-[15px] text-[#bfe6cb] mt-3.5 max-w-xl mx-auto font-semibold leading-relaxed">
+            Masukkan kondisi tanah, curah hujan, elevasi, dan suhu secara manual untuk mendapatkan kalkulasi kesesuaian lahan yang akurat.
+          </p>
+          <Link
+            href="/ruled-based"
+            className="mt-6 inline-flex items-center gap-2 bg-[#bef264] hover:bg-[#a3e635] text-[#143d27] text-[15px] font-extrabold px-6 py-3 rounded-2xl shadow-[0_8px_25px_-5px_rgba(0,0,0,0.3)] hover:-translate-y-0.5 transition-all duration-300"
+          >
+            Cek Lahan Anda Sekarang →
+          </Link>
+          <p className="text-[12px] text-[#9fd3b0] mt-3 font-semibold">Gratis · Tanpa Perlu Registrasi</p>
+        </div>
       </section>
     </Layout>
   );

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; margin: 0; }
+  .grain { background-image: radial-gradient(rgba(22,101,52,0.05) 1px, transparent 1px); background-size: 22px 22px; }
+</style>
+</helmet>
+<div class="min-h-screen bg-[#faf7f0] text-[#1a2e22]">
+
+  <!-- TOP BAR -->
+  <header class="bg-white border-b border-[#166534]/10">
+    <div class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-[#166534] flex items-center justify-center text-white text-[15px]">🌱</div>
+        <span class="font-extrabold text-[16px] tracking-tight text-[#166534]">TaniRekom</span>
+      </div>
+      <a href="#" class="flex items-center gap-1.5 text-[13.5px] font-semibold text-[#3c5547] hover:text-[#166534] transition">← Kembali ke pencarian</a>
+    </div>
+  </header>
+
+  <!-- KABUPATEN HEADER -->
+  <section class="grain border-b border-[#166534]/10">
+    <div class="max-w-6xl mx-auto px-6 py-8">
+      <div class="flex items-start justify-between flex-wrap gap-4">
+        <div>
+          <div class="flex items-center gap-2 text-[13px] font-semibold text-[#6a8174] mb-2">
+            <span>📍 Provinsi Jawa Barat</span><span class="text-[#166534]/30">•</span><span>Pulau Jawa</span>
+          </div>
+          <h1 class="text-[36px] font-extrabold tracking-tight text-[#143d27] leading-none">Kabupaten Garut</h1>
+          <p class="text-[14.5px] text-[#46604f] mt-2.5">Profil agroekologi & kesesuaian lahan · diperbarui Jun 2026</p>
+        </div>
+        <div class="flex items-center gap-2 bg-[#16a34a]/10 border border-[#16a34a]/20 rounded-xl px-4 py-2.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#16a34a]"></span>
+          <span class="text-[13.5px] font-bold text-[#15803d]">3 komoditas direkomendasikan kuat</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STAT CARDS -->
+  <section class="max-w-6xl mx-auto px-6 pt-8">
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <sc-for list="{{ stats }}" as="st" hint-placeholder-count="5">
+        <div class="bg-white rounded-2xl border border-[#166534]/10 p-5">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="w-8 h-8 rounded-lg bg-[#166534]/8 flex items-center justify-center text-[15px]">{{ st.icon }}</span>
+            <span class="text-[12.5px] font-semibold text-[#6a8174]">{{ st.label }}</span>
+          </div>
+          <div class="text-[24px] font-extrabold tracking-tight text-[#143d27] leading-none">{{ st.value }}</div>
+          <div class="text-[12px] text-[#8a9e92] mt-1.5">{{ st.note }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- CHARTS -->
+  <section class="max-w-6xl mx-auto px-6 pt-6">
+    <div class="grid md:grid-cols-2 gap-4">
+
+      <div class="bg-white rounded-2xl border border-[#166534]/10 p-5">
+        <div class="flex items-baseline justify-between mb-1">
+          <h3 class="text-[15px] font-bold text-[#1a2e22]">Curah Hujan</h3>
+          <span class="text-[12px] font-medium text-[#8a9e92]">mm / bulan · 12 bulan terakhir</span>
+        </div>
+        <div class="text-[22px] font-extrabold text-[#143d27]">2.150 <span class="text-[13px] font-semibold text-[#6a8174]">mm/thn</span></div>
+        <svg viewBox="0 0 320 140" class="w-full mt-2" preserveAspectRatio="none">
+          <line x1="10" y1="30" x2="310" y2="30" stroke="#166534" stroke-opacity="0.08"/>
+          <line x1="10" y1="60" x2="310" y2="60" stroke="#166534" stroke-opacity="0.08"/>
+          <line x1="10" y1="90" x2="310" y2="90" stroke="#166534" stroke-opacity="0.08"/>
+          <line x1="10" y1="120" x2="310" y2="120" stroke="#166534" stroke-opacity="0.08"/>
+          <polygon points="10,23 37,33 64,41 91,56 118,72 145,86 172,95 199,94 226,76 253,51 280,32 307,27 307,124 10,124" fill="#166534" fill-opacity="0.08"/>
+          <polyline points="10,23 37,33 64,41 91,56 118,72 145,86 172,95 199,94 226,76 253,51 280,32 307,27" fill="none" stroke="#166534" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div class="flex justify-between text-[10.5px] font-medium text-[#a7bbae] px-1">
+          <span>Jul</span><span>Sep</span><span>Nov</span><span>Jan</span><span>Mar</span><span>Mei</span>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-[#166534]/10 p-5">
+        <div class="flex items-baseline justify-between mb-1">
+          <h3 class="text-[15px] font-bold text-[#1a2e22]">Suhu Rata-rata</h3>
+          <span class="text-[12px] font-medium text-[#8a9e92]">°C / bulan · 12 bulan terakhir</span>
+        </div>
+        <div class="text-[22px] font-extrabold text-[#143d27]">26,0 <span class="text-[13px] font-semibold text-[#6a8174]">°C rata-rata</span></div>
+        <svg viewBox="0 0 320 140" class="w-full mt-2" preserveAspectRatio="none">
+          <line x1="10" y1="30" x2="310" y2="30" stroke="#166534" stroke-opacity="0.08"/>
+          <line x1="10" y1="60" x2="310" y2="60" stroke="#166534" stroke-opacity="0.08"/>
+          <line x1="10" y1="90" x2="310" y2="90" stroke="#166534" stroke-opacity="0.08"/>
+          <line x1="10" y1="120" x2="310" y2="120" stroke="#166534" stroke-opacity="0.08"/>
+          <polygon points="10,72 37,66 64,59 91,53 118,46 145,59 172,72 199,79 226,72 253,66 280,59 307,66 307,124 10,124" fill="#d97706" fill-opacity="0.08"/>
+          <polyline points="10,72 37,66 64,59 91,53 118,46 145,59 172,72 199,79 226,72 253,66 280,59 307,66" fill="none" stroke="#d97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div class="flex justify-between text-[10.5px] font-medium text-[#a7bbae] px-1">
+          <span>Jul</span><span>Sep</span><span>Nov</span><span>Jan</span><span>Mar</span><span>Mei</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- KOMODITAS GRID -->
+  <section class="max-w-6xl mx-auto px-6 pt-10">
+    <div class="flex items-end justify-between flex-wrap gap-3 mb-5">
+      <div>
+        <h2 class="text-[22px] font-extrabold tracking-tight text-[#143d27]">Kesesuaian Lahan per Komoditas</h2>
+        <p class="text-[13.5px] text-[#6a8174] mt-1">Kelas kesesuaian berdasarkan karakteristik lahan kabupaten.</p>
+      </div>
+      <div class="flex items-center gap-4 text-[12px] font-medium text-[#5a7265]">
+        <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#16a34a]"></span>S1 · Sangat sesuai</span>
+        <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#eab308]"></span>S2 · Cukup sesuai</span>
+        <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#dc2626]"></span>N · Tidak sesuai</span>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+      <sc-for list="{{ komoditas }}" as="k" hint-placeholder-count="8">
+        <div class="bg-white rounded-2xl border p-4 flex items-center gap-3 transition hover:-translate-y-0.5 {{ k.cardBorder }}">
+          <span class="w-11 h-11 rounded-xl bg-[#166534]/6 flex items-center justify-center text-[20px] shrink-0">{{ k.icon }}</span>
+          <div class="min-w-0 flex-1">
+            <div class="text-[14.5px] font-bold text-[#1a2e22] truncate">{{ k.name }}</div>
+            <div class="text-[12px] text-[#8a9e92]">{{ k.type }}</div>
+          </div>
+          <span class="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center text-[14px] font-extrabold {{ k.badgeCls }}">{{ k.cls }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- REKOMENDASI 3 BOX -->
+  <section class="max-w-6xl mx-auto px-6 pt-10">
+    <h2 class="text-[22px] font-extrabold tracking-tight text-[#143d27] mb-5">Rekomendasi Tanam</h2>
+    <div class="grid md:grid-cols-3 gap-4">
+      <sc-for list="{{ recos }}" as="r" hint-placeholder-count="3">
+        <div class="rounded-2xl border p-5 {{ r.boxCls }}">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="w-7 h-7 rounded-lg flex items-center justify-center text-[14px] {{ r.iconCls }}">{{ r.icon }}</span>
+            <h3 class="text-[15px] font-extrabold {{ r.titleCls }}">{{ r.title }}</h3>
+          </div>
+          <ul class="space-y-2">
+            <sc-for list="{{ r.items }}" as="it" hint-placeholder-count="3">
+              <li class="flex items-center gap-2 text-[14px] font-semibold text-[#1a2e22]">
+                <span class="text-[15px]">{{ it.icon }}</span>{{ it.name }}
+              </li>
+            </sc-for>
+          </ul>
+          <p class="text-[12.5px] mt-3.5 leading-relaxed {{ r.noteCls }}">{{ r.note }}</p>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- SUMMARY -->
+  <section class="max-w-6xl mx-auto px-6 py-10">
+    <div class="rounded-2xl bg-[#dcfce7] border border-[#16a34a]/25 p-6 md:p-8">
+      <div class="flex items-center gap-2.5 mb-3">
+        <span class="w-8 h-8 rounded-lg bg-[#166534] flex items-center justify-center text-white text-[15px]">💬</span>
+        <h3 class="text-[16px] font-extrabold text-[#143d27]">Ringkasan untuk Petani</h3>
+      </div>
+      <p class="text-[16px] md:text-[17px] leading-relaxed text-[#235c38] font-medium">
+        Lahan di <span class="font-extrabold text-[#143d27]">Kabupaten Garut</span> punya tanah lempung yang subur, udara sejuk pegunungan (sekitar 26°C), dan curah hujan yang cukup tinggi. Kondisi ini <span class="font-extrabold text-[#143d27]">paling cocok untuk cabai merah, bawang merah, dan kopi arabika</span> — ketiganya tumbuh baik dan harganya sedang naik di pasar. Tomat dan kentang masih bisa ditanam tapi hasilnya kurang maksimal. Sebaiknya <span class="font-extrabold text-[#143d27]">hindari tebu dan kelapa sawit</span> karena tidak cocok dengan iklim sejuk di sini.
+      </p>
+      <div class="flex flex-wrap gap-3 mt-5">
+        <button class="bg-[#166534] hover:bg-[#12502a] text-white text-[14px] font-bold px-5 py-2.5 rounded-xl transition">Unduh laporan lengkap</button>
+        <button class="bg-white border border-[#166534]/20 text-[#166534] text-[14px] font-bold px-5 py-2.5 rounded-xl hover:border-[#166534]/40 transition">Bandingkan kabupaten lain</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const stats = [
+      { label: "pH Tanah",     icon: "🧪", value: "6,2",   note: "Agak masam · ideal" },
+      { label: "Elevasi",      icon: "⛰️", value: "720",   note: "mdpl · dataran tinggi" },
+      { label: "Tekstur",      icon: "🪨", value: "Lempung", note: "Drainase baik" },
+      { label: "Suhu",         icon: "🌡️", value: "26°C",  note: "Sejuk · stabil" },
+      { label: "Curah Hujan",  icon: "🌧️", value: "2.150", note: "mm/thn · tinggi" },
+    ];
+
+    const S1 = { badgeCls: "bg-[#16a34a]/15 text-[#15803d]", cardBorder: "border-[#16a34a]/25" };
+    const S2 = { badgeCls: "bg-[#eab308]/18 text-[#a16207]", cardBorder: "border-[#eab308]/30" };
+    const N  = { badgeCls: "bg-[#dc2626]/12 text-[#b91c1c]", cardBorder: "border-[#dc2626]/20" };
+    const mk = (name, type, icon, cls, S) => ({ name, type, icon, cls, ...S });
+
+    const komoditas = [
+      mk("Cabai Merah",  "Hortikultura",   "🌶️", "S1", S1),
+      mk("Bawang Merah", "Hortikultura",   "🧅", "S1", S1),
+      mk("Kopi Arabika", "Perkebunan",     "☕", "S1", S1),
+      mk("Wortel",       "Hortikultura",   "🥕", "S2", S2),
+      mk("Tomat",        "Hortikultura",   "🍅", "S2", S2),
+      mk("Kentang",      "Hortikultura",   "🥔", "S2", S2),
+      mk("Padi",         "Tanaman pangan", "🌾", "S2", S2),
+      mk("Tebu",         "Perkebunan",     "🎋", "N",  N),
+    ];
+
+    const recos = [
+      {
+        title: "Direkomendasikan Kuat",
+        icon: "✓", note: "Kesesuaian tinggi dan harga pasar sedang naik. Prioritaskan komoditas ini.",
+        boxCls: "bg-[#16a34a]/8 border-[#16a34a]/25",
+        iconCls: "bg-[#16a34a] text-white", titleCls: "text-[#15803d]", noteCls: "text-[#3f7553]",
+        items: [
+          { icon: "🌶️", name: "Cabai Merah" },
+          { icon: "🧅", name: "Bawang Merah" },
+          { icon: "☕", name: "Kopi Arabika" },
+        ],
+      },
+      {
+        title: "Rekomendasi Lemah",
+        icon: "!", note: "Masih bisa ditanam, namun hasil dan keuntungan cenderung kurang optimal.",
+        boxCls: "bg-[#eab308]/8 border-[#eab308]/30",
+        iconCls: "bg-[#eab308] text-white", titleCls: "text-[#a16207]", noteCls: "text-[#8a6d1f]",
+        items: [
+          { icon: "🍅", name: "Tomat" },
+          { icon: "🥔", name: "Kentang" },
+          { icon: "🌾", name: "Padi" },
+        ],
+      },
+      {
+        title: "Tidak Mendukung",
+        icon: "✕", note: "Iklim dan karakter lahan tidak sesuai. Sebaiknya dihindari.",
+        boxCls: "bg-[#dc2626]/7 border-[#dc2626]/22",
+        iconCls: "bg-[#dc2626] text-white", titleCls: "text-[#b91c1c]", noteCls: "text-[#9a3b3b]",
+        items: [
+          { icon: "🎋", name: "Tebu" },
+          { icon: "🌴", name: "Kelapa Sawit" },
+        ],
+      },
+    ];
+
+    return { stats, komoditas, recos };
+  }
+}
+</script>
+</body>
+</html>

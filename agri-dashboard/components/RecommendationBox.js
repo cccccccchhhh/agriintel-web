@@ -1,8 +1,53 @@
 // components/RecommendationBox.js
+const EMOJI_MAP = {
+  padi: "🌾", jagung: "🌽", kedelai: "🫘", "kacang tanah": "🥜",
+  "kacang hijau": "🫘", "kacang panjang": "🫘", ubi: "🍠",
+  tebu: "🎋", "kelapa sawit": "🌴", kelapa: "🥥",
+  karet: "🌿", kakao: "🍫", kopi: "☕", teh: "🍵",
+  pisang: "🍌", mangga: "🥭", nanas: "🍍", pepaya: "🍈",
+  durian: "🍈", cabai: "🌶️", bawang: "🧅", tomat: "🍅",
+  kentang: "🥔", wortel: "🥕", sawi: "🥬", bayam: "🥬",
+  semangka: "🍉", melon: "🍈", lada: "🌶️", cengkeh: "🌸",
+  pala: "🌰", vanili: "🌿", jahe: "🫚", kunyit: "🫚",
+  kapas: "🪴", tembakau: "🍃",
+};
+
+function getEmoji(name) {
+  const lower = name.toLowerCase();
+  for (const [k, v] of Object.entries(EMOJI_MAP)) {
+    if (lower.includes(k)) return v;
+  }
+  return "🌱";
+}
+
 const STYLE = {
-  kuat: { bg: "bg-green-50", border: "border-green-300", title: "✅ Rekomendasi Kuat", titleColor: "text-green-700" },
-  lemah: { bg: "bg-yellow-50", border: "border-yellow-300", title: "⚠️ Rekomendasi Lemah", titleColor: "text-yellow-700" },
-  tidak: { bg: "bg-red-50", border: "border-red-200", title: "❌ Cocok Iklim, Demand Tidak Mendukung", titleColor: "text-red-600" },
+  kuat: {
+    boxCls: "bg-[#16a34a]/8 border-[#16a34a]/25",
+    iconCls: "bg-[#16a34a] text-white",
+    titleCls: "text-[#15803d]",
+    noteCls: "text-[#3f7553]",
+    title: "Direkomendasikan Kuat",
+    icon: "✓",
+    note: "Kesesuaian tinggi dan harga pasar sedang naik. Prioritaskan komoditas ini."
+  },
+  lemah: {
+    boxCls: "bg-[#eab308]/8 border-[#eab308]/30",
+    iconCls: "bg-[#eab308] text-white",
+    titleCls: "text-[#a16207]",
+    noteCls: "text-[#8a6d1f]",
+    title: "Rekomendasi Lemah",
+    icon: "!",
+    note: "Masih bisa ditanam, namun hasil dan keuntungan cenderung kurang optimal."
+  },
+  tidak: {
+    boxCls: "bg-[#dc2626]/7 border-[#dc2626]/22",
+    iconCls: "bg-[#dc2626] text-white",
+    titleCls: "text-[#b91c1c]",
+    noteCls: "text-[#9a3b3b]",
+    title: "Tidak Mendukung",
+    icon: "✕",
+    note: "Iklim dan karakter lahan tidak sesuai atau demand pasar sangat lemah. Sebaiknya dihindari."
+  }
 };
 
 export default function RecommendationBox({ type, items, distribusi, descriptions }) {
@@ -10,21 +55,40 @@ export default function RecommendationBox({ type, items, distribusi, description
   if (!items || items.length === 0) return null;
 
   return (
-    <div className={`rounded-xl border ${s.border} ${s.bg} p-4`}>
-      <h3 className={`font-semibold mb-2 ${s.titleColor}`}>{s.title}</h3>
-      <ul className="space-y-2">
+    <div className={`rounded-2xl border p-5 transition-all duration-300 hover:shadow-sm animate-fade-in-up ${s.boxCls}`}>
+      <div className="flex items-center gap-2.5 mb-4">
+        <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-[14px] font-extrabold ${s.iconCls}`}>
+          {s.icon}
+        </span>
+        <h3 className={`text-[15px] font-extrabold ${s.titleCls}`}>
+          {s.title}
+        </h3>
+      </div>
+      
+      <ul className="space-y-3 pl-1">
         {items.map((kom) => (
-          <li key={kom} className="text-sm">
-            <span className="font-medium">{kom}</span>
-            {descriptions?.[type] && <p className="text-gray-500 text-xs mt-0.5">{descriptions[type]}</p>}
+          <li key={kom} className="flex flex-col text-[14px] font-bold text-[#1a2e22]">
+            <div className="flex items-center gap-2">
+              <span className="text-[16px] shrink-0">{getEmoji(kom)}</span>
+              <span>{kom}</span>
+            </div>
+            {descriptions?.[type] && (
+              <p className="text-[11px] text-gray-500 font-semibold mt-0.5 ml-6">
+                {descriptions[type]}
+              </p>
+            )}
             {distribusi && distribusi[kom] && distribusi[kom].length > 0 && (
-              <p className="text-xs text-gray-500 mt-0.5">
-                Saran distribusi: <span className="font-medium">{distribusi[kom].join(", ")}</span>
+              <p className="text-[11px] text-[#4b5563] font-semibold mt-0.5 ml-6">
+                📍 Sentra distribusi: <span className="font-bold text-[#1f2937]">{distribusi[kom].join(", ")}</span>
               </p>
             )}
           </li>
         ))}
       </ul>
+      
+      <p className={`text-[12px] mt-4 leading-relaxed font-semibold ${s.noteCls}`}>
+        {s.note}
+      </p>
     </div>
   );
 }

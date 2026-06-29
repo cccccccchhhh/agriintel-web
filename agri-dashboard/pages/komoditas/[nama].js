@@ -98,183 +98,235 @@ export default function KomoditasPage({ namaKomoditas, lurRow, trenData, kabupat
         <title>{namaKomoditas} — AgriRekomendasi</title>
       </Head>
 
-      {/* Breadcrumb */}
-      <nav className="text-sm text-gray-400 mb-4">
-        <Link href="/" className="hover:underline">Beranda</Link>
-        <span className="mx-2">/</span>
+      {/* BREADCRUMB */}
+      <nav className="text-xs md:text-sm text-gray-400 mb-4 font-bold flex items-center gap-1.5 animate-fade-in">
+        <Link href="/" className="hover:text-[#166534] transition-colors">Beranda</Link>
+        <span>/</span>
         <span className="text-gray-600">{namaKomoditas}</span>
       </nav>
 
-      {/* Header */}
-      <header className="mb-6 flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-bold text-green-900">{namaKomoditas}</h1>
+      {/* HEADER BANNER */}
+      <header className="mb-6 flex flex-wrap items-center gap-3 animate-fade-in">
+        <div className="w-10 h-10 rounded-xl bg-[#166534]/10 flex items-center justify-center text-[22px]">
+          {getEmoji(namaKomoditas)}
+        </div>
+        <h1 className="text-[28px] md:text-[32px] font-extrabold text-[#143d27]">{namaKomoditas}</h1>
         {tren && (
           <Badge text={trenMeta.label || tren} color={trenMeta.color || "#6b7280"} />
         )}
       </header>
 
-      {/* Stat cards */}
-      <section className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+      {/* STAT CARDS SECTION */}
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <StatCard
           label="Kabupaten Sangat Cocok"
           value={nS1}
           sub="kelas S1"
           color="#16a34a"
+          icon="✅"
+          iconBg="bg-green-50 text-green-700"
         />
         <StatCard
           label="Kabupaten Cukup Cocok"
           value={nS2}
           sub="kelas S2"
           color="#ca8a04"
+          icon="⚠️"
+          iconBg="bg-yellow-50 text-yellow-700"
         />
-        {trenData && (
+        {trenData ? (
           <>
             <StatCard
               label="Slope Tren Demand"
               value={`${trenData.slope > 0 ? "+" : ""}${(trenData.slope * 100).toFixed(2)}%`}
               sub="per tahun"
               color={trenMeta.color || "#6b7280"}
+              icon="📈"
+              iconBg="bg-[#166534]/8 text-[#166534]"
             />
             <StatCard
               label="Tahun Data"
               value={trenData.n_tahun_data}
               sub={trenData.model_type}
               color="#0369a1"
+              icon="📅"
+              iconBg="bg-blue-50 text-blue-700"
+            />
+          </>
+        ) : (
+          <>
+            <StatCard
+              label="Slope Tren Demand"
+              value="—"
+              sub="tidak ada data"
+              color="#6b7280"
+              icon="📈"
+              iconBg="bg-gray-100 text-gray-500"
+            />
+            <StatCard
+              label="Tahun Data"
+              value="—"
+              sub="n/a"
+              color="#6b7280"
+              icon="📅"
+              iconBg="bg-gray-100 text-gray-500"
             />
           </>
         )}
       </section>
 
-      {/* Syarat Tumbuh */}
-      <section className="mb-10">
-        <h2 className="text-xl font-semibold mb-4 text-green-900">Syarat Tumbuh (FAO/ECOCROP)</h2>
+      {/* SYARAT TUMBUH SECTION */}
+      <section className="mb-10 animate-fade-in delay-100">
+        <h2 className="text-[18px] md:text-[20px] font-extrabold mb-4 text-[#143d27]">Syarat Tumbuh (FAO/ECOCROP)</h2>
         {st ? (
-          <div className="bg-white rounded-xl shadow-sm p-5 space-y-6">
+          <div className="bg-white rounded-3xl border border-[#166534]/10 p-6 space-y-6 shadow-sm">
             {/* pH */}
-            <div>
-              <div className="text-sm font-medium text-gray-700 mb-2">pH Tanah</div>
-              <RangeBar
-                absMin={st.ph_abs?.[0]}
-                absMax={st.ph_abs?.[1]}
-                optMin={st.ph_opt?.[0]}
-                optMax={st.ph_opt?.[1]}
-                domainMin={3}
-                domainMax={10}
-                unit=""
-                color="#16a34a"
-              />
+            <div className="grid md:grid-cols-[160px_1fr] items-start gap-2 border-b border-gray-100 pb-5">
+              <div className="text-[14px] font-extrabold text-[#1a2e22] mt-1 flex items-center gap-1.5">
+                <span>🧪</span> pH Tanah
+              </div>
+              <div className="w-full">
+                <RangeBar
+                  absMin={st.ph_abs?.[0]}
+                  absMax={st.ph_abs?.[1]}
+                  optMin={st.ph_opt?.[0]}
+                  optMax={st.ph_opt?.[1]}
+                  domainMin={3}
+                  domainMax={10}
+                  unit=""
+                  color="#16a34a"
+                />
+              </div>
             </div>
 
             {/* Curah Hujan */}
-            <div>
-              <div className="text-sm font-medium text-gray-700 mb-2">Curah Hujan Tahunan</div>
-              <RangeBar
-                absMin={st.ch_abs_mmthn?.[0]}
-                absMax={st.ch_abs_mmthn?.[1]}
-                optMin={st.ch_opt_mmthn?.[0]}
-                optMax={st.ch_opt_mmthn?.[1]}
-                domainMin={0}
-                domainMax={5000}
-                unit="mm/thn"
-                color="#0369a1"
-              />
+            <div className="grid md:grid-cols-[160px_1fr] items-start gap-2 border-b border-gray-100 pb-5">
+              <div className="text-[14px] font-extrabold text-[#1a2e22] mt-1 flex items-center gap-1.5">
+                <span>🌧️</span> Curah Hujan Tahunan
+              </div>
+              <div className="w-full">
+                <RangeBar
+                  absMin={st.ch_abs_mmthn?.[0]}
+                  absMax={st.ch_abs_mmthn?.[1]}
+                  optMin={st.ch_opt_mmthn?.[0]}
+                  optMax={st.ch_opt_mmthn?.[1]}
+                  domainMin={0}
+                  domainMax={5000}
+                  unit="mm/thn"
+                  color="#0284c7"
+                />
+              </div>
             </div>
 
             {/* Suhu */}
-            <div>
-              <div className="text-sm font-medium text-gray-700 mb-2">Suhu Rata-rata</div>
-              <RangeBar
-                absMin={st.suhu_abs?.[0]}
-                absMax={st.suhu_abs?.[1]}
-                optMin={st.suhu_opt?.[0]}
-                optMax={st.suhu_opt?.[1]}
-                domainMin={0}
-                domainMax={50}
-                unit="°C"
-                color="#dc2626"
-              />
+            <div className="grid md:grid-cols-[160px_1fr] items-start gap-2 border-b border-gray-100 pb-5">
+              <div className="text-[14px] font-extrabold text-[#1a2e22] mt-1 flex items-center gap-1.5">
+                <span>🌡️</span> Suhu Rata-rata
+              </div>
+              <div className="w-full">
+                <RangeBar
+                  absMin={st.suhu_abs?.[0]}
+                  absMax={st.suhu_abs?.[1]}
+                  optMin={st.suhu_opt?.[0]}
+                  optMax={st.suhu_opt?.[1]}
+                  domainMin={0}
+                  domainMax={50}
+                  unit="°C"
+                  color="#d97706"
+                />
+              </div>
             </div>
 
             {/* Elevasi */}
-            <div>
-              <div className="text-sm font-medium text-gray-700 mb-2">Elevasi Maksimum</div>
-              {st.altitude_maks_m != null ? (
-                <div className="space-y-1">
-                  <div className="relative h-4 rounded bg-gray-100 overflow-hidden">
-                    <div
-                      className="absolute h-full rounded opacity-50"
-                      style={{
-                        left: 0,
-                        width: `${((st.altitude_maks_m / 5000) * 100).toFixed(1)}%`,
-                        backgroundColor: "#7c3aed",
-                      }}
-                    />
+            <div className="grid md:grid-cols-[160px_1fr] items-start gap-2 border-b border-gray-100 pb-5">
+              <div className="text-[14px] font-extrabold text-[#1a2e22] mt-1 flex items-center gap-1.5">
+                <span>⛰️</span> Elevasi Maksimum
+              </div>
+              <div className="w-full">
+                {st.altitude_maks_m != null ? (
+                  <div className="space-y-2">
+                    <div className="relative h-4 rounded-full bg-gray-100 overflow-hidden border border-gray-200/50">
+                      <div
+                        className="absolute h-full rounded-full opacity-60"
+                        style={{
+                          left: 0,
+                          width: `${Math.min(100, (st.altitude_maks_m / 4000) * 100).toFixed(1)}%`,
+                          backgroundColor: "#7c3aed",
+                        }}
+                      />
+                    </div>
+                    <div className="text-[11.5px] text-gray-500 font-bold">Batas Maksimal: {st.altitude_maks_m} mdpl</div>
                   </div>
-                  <div className="text-[11px] text-gray-500">Maks: {st.altitude_maks_m} mdpl</div>
-                </div>
-              ) : (
-                <span className="text-gray-400 text-sm">Tidak ada batasan elevasi</span>
-              )}
+                ) : (
+                  <span className="text-gray-400 text-sm font-semibold">Tidak ada batasan elevasi khusus</span>
+                )}
+              </div>
             </div>
 
             {/* Tekstur */}
-            <div>
-              <div className="text-sm font-medium text-gray-700 mb-2">Tekstur Tanah</div>
-              <div className="space-y-2">
-                <div className="flex items-center gap-3 text-sm">
-                  <span className="text-gray-500 w-16 shrink-0">Optimal:</span>
+            <div className="grid md:grid-cols-[160px_1fr] items-start gap-2">
+              <div className="text-[14px] font-extrabold text-[#1a2e22] mt-1 flex items-center gap-1.5">
+                <span>🪨</span> Tekstur Tanah
+              </div>
+              <div className="space-y-3 pl-1">
+                <div className="flex items-center gap-3 text-[13px] font-bold">
+                  <span className="text-[#6a8174] w-20 shrink-0">Optimal:</span>
                   <TeksturBadges value={st.tekstur_opt} isOpt={true} />
                 </div>
-                <div className="flex items-center gap-3 text-sm">
-                  <span className="text-gray-500 w-16 shrink-0">Absolut:</span>
+                <div className="flex items-center gap-3 text-[13px] font-bold">
+                  <span className="text-[#6a8174] w-20 shrink-0">Toleransi:</span>
                   <TeksturBadges value={st.tekstur_abs} isOpt={false} />
                 </div>
               </div>
             </div>
           </div>
         ) : (
-          <p className="text-gray-400 bg-white rounded-xl shadow-sm p-5">
+          <p className="text-gray-400 bg-white rounded-3xl border border-[#166534]/10 p-6 shadow-sm">
             Data syarat tumbuh belum tersedia untuk komoditas ini.
           </p>
         )}
       </section>
 
-      {/* Kabupaten Cocok */}
-      <section className="mb-10">
-        <h2 className="text-xl font-semibold mb-1 text-green-900">
-          Kabupaten/Kota yang Cocok
-        </h2>
-        <p className="text-sm text-gray-500 mb-4">
-          {kabupatenCocok.length} kabupaten/kota — S1 (sangat cocok) ditampilkan lebih dulu.
-        </p>
+      {/* KABUPATEN COCOK SECTION */}
+      <section className="mb-10 animate-fade-in delay-200">
+        <div className="mb-4">
+          <h2 className="text-[18px] md:text-[20px] font-extrabold text-[#143d27]">
+            Kabupaten/Kota yang Cocok
+          </h2>
+          <p className="text-[13px] text-[#6a8174] mt-1 font-semibold">
+            Menampilkan {kabupatenCocok.length} wilayah yang sesuai — S1 (sangat cocok) diprioritaskan.
+          </p>
+        </div>
 
         {kabupatenCocok.length === 0 ? (
-          <p className="text-gray-400">Tidak ada kabupaten dengan kelas S1 atau S2.</p>
+          <p className="text-gray-400 bg-white rounded-3xl border border-[#166534]/10 p-6 shadow-sm text-center">
+            Tidak ada kabupaten/kota yang masuk kelas S1 atau S2 untuk komoditas ini.
+          </p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm bg-white rounded-xl shadow-sm overflow-hidden">
-              <thead className="bg-gray-50 text-gray-500 text-left">
-                <tr>
-                  <th className="px-4 py-2">#</th>
-                  <th className="px-4 py-2">Kabupaten/Kota</th>
-                  <th className="px-4 py-2">Provinsi</th>
-                  <th className="px-4 py-2">Kelas</th>
+          <div className="overflow-x-auto rounded-3xl border border-[#166534]/8">
+            <table className="w-full text-left border-collapse min-w-[500px]">
+              <thead>
+                <tr className="bg-[#f3f8f4] text-[#5a7265] text-[12px] font-bold uppercase tracking-wider">
+                  <th className="px-5 py-3.5">#</th>
+                  <th className="px-5 py-3.5">Kabupaten/Kota</th>
+                  <th className="px-5 py-3.5">Provinsi</th>
+                  <th className="px-5 py-3.5">Kelas Kesesuaian</th>
                 </tr>
               </thead>
               <tbody>
                 {kabupatenCocok.map((kab, i) => (
-                  <tr key={kab.kode_kab} className="border-t border-gray-100 hover:bg-gray-50">
-                    <td className="px-4 py-2 text-gray-400">{i + 1}</td>
-                    <td className="px-4 py-2 font-medium">
+                  <tr key={kab.kode_kab} className="border-t border-[#166534]/6 hover:bg-[#faf9f4]/60 transition-colors duration-150">
+                    <td className="px-5 py-4 text-gray-400 font-bold text-[13px]">{i + 1}</td>
+                    <td className="px-5 py-4 font-bold text-[14.5px]">
                       <Link
                         href={`/kabupaten/${kab.kode_kab}`}
-                        className="text-green-700 hover:underline"
+                        className="text-[#166534] hover:underline"
                       >
                         {kab.nama_kab}
                       </Link>
                     </td>
-                    <td className="px-4 py-2 text-gray-500">{kab.provinsi}</td>
-                    <td className="px-4 py-2">
+                    <td className="px-5 py-4 text-gray-500 font-semibold">{kab.provinsi}</td>
+                    <td className="px-5 py-4">
                       <Badge
                         text={KELAS_LABEL[kab.kelas]?.label || kab.kelas}
                         color={KELAS_LABEL[kab.kelas]?.color || "#6b7280"}

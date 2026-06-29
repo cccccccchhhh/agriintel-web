@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; margin: 0; }
+  .grain { background-image: radial-gradient(rgba(22,101,52,0.05) 1px, transparent 1px); background-size: 22px 22px; }
+  input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type=number] { -moz-appearance: textfield; }
+</style>
+</helmet>
+<div class="min-h-screen bg-[#faf7f0] text-[#1a2e22]">
+
+  <!-- TOP BAR -->
+  <header class="bg-white border-b border-[#166534]/10">
+    <div class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-[#166534] flex items-center justify-center text-white text-[15px]">🌱</div>
+        <span class="font-extrabold text-[16px] tracking-tight text-[#166534]">TaniRekom</span>
+      </div>
+      <a href="#" class="flex items-center gap-1.5 text-[13.5px] font-semibold text-[#3c5547] hover:text-[#166534] transition">← Kembali</a>
+    </div>
+  </header>
+
+  <!-- HEADER -->
+  <section class="grain border-b border-[#166534]/10">
+    <div class="max-w-6xl mx-auto px-6 py-8">
+      <span class="inline-flex items-center gap-2 text-[12.5px] font-semibold text-[#166534] bg-[#22c55e]/12 border border-[#166534]/15 px-3 py-1 rounded-full mb-4">🧭 Mode manual</span>
+      <h1 class="text-[32px] font-extrabold tracking-tight text-[#143d27] leading-tight">Cek Kesesuaian Lahan Manual</h1>
+      <p class="text-[15px] text-[#46604f] mt-2.5 max-w-2xl">Pilih kabupaten untuk mengisi data otomatis, lalu sesuaikan parameter sesuai kondisi lahanmu sendiri. Hasil klasifikasi diperbarui otomatis.</p>
+    </div>
+  </section>
+
+  <div class="max-w-6xl mx-auto px-6 py-8 grid lg:grid-cols-[380px_1fr] gap-6 items-start">
+
+    <!-- FORM -->
+    <div class="bg-white rounded-2xl border border-[#166534]/10 p-6 lg:sticky lg:top-6">
+      <h2 class="text-[16px] font-extrabold text-[#143d27] mb-1">Parameter Lahan</h2>
+      <p class="text-[12.5px] text-[#8a9e92] mb-5">Field berwarna hijau = diisi manual.</p>
+
+      <label class="block mb-4">
+        <span class="block text-[12.5px] font-semibold text-[#3c5547] mb-1.5">Kabupaten</span>
+        <select value="{{ kab }}" onChange="{{ onKab }}" class="w-full bg-[#faf7f0] border border-[#166534]/15 rounded-xl px-3.5 py-2.5 text-[14px] font-medium text-[#1a2e22] outline-none focus:border-[#166534]/45 transition cursor-pointer">
+          <sc-for list="{{ kabList }}" as="kb" hint-placeholder-count="4">
+            <option value="{{ kb }}">{{ kb }}</option>
+          </sc-for>
+        </select>
+      </label>
+
+      <div class="grid grid-cols-2 gap-3">
+        <sc-for list="{{ numFields }}" as="f" hint-placeholder-count="4">
+          <label class="block">
+            <span class="flex items-center justify-between text-[12.5px] font-semibold text-[#3c5547] mb-1.5">{{ f.label }}<span class="text-[11px] font-medium text-[#a7bbae]">{{ f.unit }}</span></span>
+            <div class="rounded-xl flex items-center px-3.5" style="{{ f.style }}">
+              <input type="number" value="{{ f.value }}" onInput="{{ f.onInput }}" class="w-full bg-transparent border-0 outline-none py-2.5 text-[14px] font-semibold text-[#1a2e22]" />
+            </div>
+            <span class="block text-[10.5px] font-semibold mt-1" style="{{ f.tagStyle }}">{{ f.tag }}</span>
+          </label>
+        </sc-for>
+      </div>
+
+      <label class="block mt-3">
+        <span class="block text-[12.5px] font-semibold text-[#3c5547] mb-1.5">Tekstur Tanah</span>
+        <div class="rounded-xl flex items-center" style="{{ tekstur.style }}">
+          <select value="{{ tekstur.value }}" onChange="{{ tekstur.onInput }}" class="w-full bg-transparent border-0 rounded-xl px-3.5 py-2.5 text-[14px] font-semibold text-[#1a2e22] outline-none cursor-pointer">
+            <sc-for list="{{ teksturList }}" as="t" hint-placeholder-count="5">
+              <option value="{{ t }}">{{ t }}</option>
+            </sc-for>
+          </select>
+        </div>
+        <span class="block text-[10.5px] font-semibold mt-1" style="{{ tekstur.tagStyle }}">{{ tekstur.tag }}</span>
+      </label>
+
+      <button onClick="{{ reset }}" class="w-full mt-6 text-[13px] font-semibold text-[#166534] border border-[#166534]/20 rounded-xl py-2.5 hover:bg-[#166534]/5 transition">↺ Reset ke default kabupaten</button>
+    </div>
+
+    <!-- RESULTS -->
+    <div>
+      <!-- CHIPS -->
+      <div class="mb-6">
+        <h2 class="text-[15px] font-extrabold text-[#143d27] mb-3">Indikator yang Digunakan</h2>
+        <div class="flex flex-wrap gap-2.5">
+          <sc-for list="{{ chips }}" as="c" hint-placeholder-count="5">
+            <div class="inline-flex items-center gap-2.5 bg-white rounded-xl border px-3.5 py-2" style="{{ c.borderStyle }}">
+              <span class="text-[15px]">{{ c.icon }}</span>
+              <span>
+                <span class="block text-[11px] font-medium text-[#8a9e92] leading-tight">{{ c.label }}</span>
+                <span class="block text-[14px] font-extrabold text-[#143d27] leading-tight">{{ c.value }}</span>
+              </span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="{{ c.tagStyle }}">{{ c.tag }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <!-- CLASSIFICATION GRID -->
+      <h2 class="text-[15px] font-extrabold text-[#143d27] mb-1">Hasil Klasifikasi Komoditas</h2>
+      <div class="flex items-center gap-4 text-[11.5px] font-medium text-[#5a7265] mb-4">
+        <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#16a34a]"></span>S1 Sangat sesuai</span>
+        <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#eab308]"></span>S2 Cukup sesuai</span>
+        <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#dc2626]"></span>N Tidak sesuai</span>
+      </div>
+      <div class="grid sm:grid-cols-2 gap-3">
+        <sc-for list="{{ results }}" as="r" hint-placeholder-count="6">
+          <div class="bg-white rounded-2xl border p-4 flex items-start gap-3" style="{{ r.cardBorderStyle }}">
+            <span class="w-11 h-11 rounded-xl bg-[#166534]/6 flex items-center justify-center text-[20px] shrink-0">{{ r.icon }}</span>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[14.5px] font-bold text-[#1a2e22] truncate">{{ r.name }}</span>
+                <span class="shrink-0 text-[12px] font-extrabold px-2.5 py-1 rounded-lg" style="{{ r.badgeStyle }}">{{ r.cls }}</span>
+              </div>
+              <div class="text-[12px] mt-1.5 leading-snug font-semibold" style="{{ r.lfStyle }}">{{ r.limiting }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  KAB = {
+    "Kabupaten Garut":   { ph: 6.2, curah: 2150, suhu: 26, elevasi: 720,  tekstur: "Lempung" },
+    "Kabupaten Bandung": { ph: 5.8, curah: 2000, suhu: 23, elevasi: 1100, tekstur: "Lempung berdebu" },
+    "Kabupaten Brebes":  { ph: 6.5, curah: 1400, suhu: 28, elevasi: 50,   tekstur: "Lempung berpasir" },
+    "Kabupaten Karo":    { ph: 5.6, curah: 1900, suhu: 20, elevasi: 1300, tekstur: "Lempung" },
+  };
+  TEKSTUR = ["Pasir", "Lempung berpasir", "Lempung", "Lempung berdebu", "Liat"];
+
+  state = { kab: "Kabupaten Garut", f: null };
+
+  loadDefaults(kab) {
+    const d = this.KAB[kab];
+    return {
+      ph: { v: d.ph, manual: false },
+      curah: { v: d.curah, manual: false },
+      suhu: { v: d.suhu, manual: false },
+      elevasi: { v: d.elevasi, manual: false },
+      tekstur: { v: d.tekstur, manual: false },
+    };
+  }
+
+  ensure() {
+    if (!this.state.f) this.state.f = this.loadDefaults(this.state.kab);
+  }
+
+  setField(key, v) {
+    this.setState(s => ({ f: { ...s.f, [key]: { v, manual: true } } }));
+  }
+  onKabChange = (e) => {
+    const kab = e.target.value;
+    this.setState({ kab, f: this.loadDefaults(kab) });
+  };
+  reset = () => this.setState(s => ({ f: this.loadDefaults(s.kab) }));
+
+  // ---- suitability ranges [lo, hi] (ideal); marginal extends 25% ----
+  KOMO = [
+    { name: "Cabai Merah",  icon: "🌶️", ph: [5.5, 6.8], suhu: [21, 28], elevasi: [0, 1200],   curah: [800, 2200] },
+    { name: "Bawang Merah", icon: "🧅", ph: [5.6, 6.5], suhu: [22, 30], elevasi: [0, 1000],   curah: [700, 2300] },
+    { name: "Kopi Arabika", icon: "☕", ph: [5.3, 6.5], suhu: [15, 24], elevasi: [600, 2000], curah: [1500, 2500] },
+    { name: "Tomat",        icon: "🍅", ph: [6.0, 7.0], suhu: [18, 27], elevasi: [200, 1500], curah: [600, 1900] },
+    { name: "Kentang",      icon: "🥔", ph: [5.0, 6.5], suhu: [15, 24], elevasi: [800, 2000], curah: [1000, 1800] },
+    { name: "Padi",         icon: "🌾", ph: [5.5, 7.0], suhu: [22, 30], elevasi: [0, 700],    curah: [1500, 2800] },
+  ];
+  LABELS = { ph: "pH", suhu: "Suhu", elevasi: "Elevasi", curah: "Curah hujan" };
+
+  evalFactor(key, v, range) {
+    const [lo, hi] = range;
+    const ext = (hi - lo) * 0.25;
+    if (v >= lo && v <= hi) return { st: 0 };
+    if (v >= lo - ext && v <= hi + ext) return { st: 1, dir: v < lo ? "rendah" : "tinggi" };
+    return { st: 2, dir: v < lo ? "rendah" : "tinggi" };
+  }
+
+  classify(komo, vals) {
+    const checks = ["ph", "suhu", "elevasi", "curah"].map(k => ({ k, ...this.evalFactor(k, vals[k], komo[k]) }));
+    const worst = Math.max(...checks.map(c => c.st));
+    let cls, limiting;
+    if (worst === 2) {
+      const bad = checks.find(c => c.st === 2);
+      cls = "N";
+      limiting = this.LABELS[bad.k] + (bad.dir === "rendah" ? " terlalu rendah" : " terlalu tinggi");
+    } else if (worst === 1) {
+      const m = checks.find(c => c.st === 1);
+      cls = "S2";
+      limiting = this.LABELS[m.k] + (m.dir === "rendah" ? " agak rendah" : " agak tinggi");
+    } else {
+      cls = "S1";
+      limiting = "Semua parameter sesuai";
+    }
+    return { cls, limiting };
+  }
+
+  renderVals() {
+    this.ensure();
+    const f = this.state.f;
+    const num = (x) => parseFloat(x) || 0;
+    const vals = { ph: num(f.ph.v), curah: num(f.curah.v), suhu: num(f.suhu.v), elevasi: num(f.elevasi.v) };
+
+    const greenInput = { background: "rgba(22,163,74,0.10)", borderWidth: "2px", borderStyle: "solid", borderColor: "#16a34a", boxShadow: "0 0 0 3px rgba(22,163,74,0.12)" };
+    const grayInput  = { background: "#faf7f0", borderWidth: "1px", borderStyle: "solid", borderColor: "rgba(22,101,52,0.18)", boxShadow: "none" };
+    const tagManual  = { color: "#15803d" };
+    const tagDefault = { color: "#a7bbae" };
+
+    const fieldDef = [
+      { key: "ph",      label: "pH Tanah",     unit: "" },
+      { key: "curah",   label: "Curah Hujan",  unit: "mm/thn" },
+      { key: "suhu",    label: "Suhu",         unit: "°C" },
+      { key: "elevasi", label: "Elevasi",      unit: "mdpl" },
+    ];
+    const numFields = fieldDef.map(d => ({
+      label: d.label, unit: d.unit, value: f[d.key].v,
+      onInput: (e) => this.setField(d.key, e.target.value),
+      style: f[d.key].manual ? greenInput : grayInput,
+      tag: f[d.key].manual ? "● diisi manual" : "default kabupaten",
+      tagStyle: f[d.key].manual ? tagManual : tagDefault,
+    }));
+
+    const tekstur = {
+      value: f.tekstur.v,
+      onInput: (e) => this.setField("tekstur", e.target.value),
+      style: f.tekstur.manual ? greenInput : grayInput,
+      tag: f.tekstur.manual ? "● diisi manual" : "default kabupaten",
+      tagStyle: f.tekstur.manual ? tagManual : tagDefault,
+    };
+
+    // chips
+    const chipDef = [
+      { key: "ph",      label: "pH Tanah",    icon: "🧪", suffix: "" },
+      { key: "curah",   label: "Curah Hujan", icon: "🌧️", suffix: " mm" },
+      { key: "suhu",    label: "Suhu",        icon: "🌡️", suffix: " °C" },
+      { key: "elevasi", label: "Elevasi",     icon: "⛰️", suffix: " mdpl" },
+      { key: "tekstur", label: "Tekstur",     icon: "🪨", suffix: "" },
+    ];
+    const chips = chipDef.map(c => {
+      const m = f[c.key].manual;
+      return {
+        label: c.label, icon: c.icon, value: f[c.key].v + c.suffix,
+        borderStyle: { borderColor: m ? "rgba(22,163,74,0.35)" : "rgba(22,101,52,0.10)" },
+        tag: m ? "diisi manual" : "default kabupaten",
+        tagStyle: m
+          ? { background: "rgba(22,163,74,0.12)", color: "#15803d" }
+          : { background: "rgba(22,101,52,0.06)", color: "#8a9e92" },
+      };
+    });
+
+    const STY = {
+      S1: { badgeStyle: { background: "rgba(22,163,74,0.15)", color: "#15803d" }, cardBorderStyle: { borderColor: "rgba(22,163,74,0.25)" }, lfStyle: { color: "#3f7553" } },
+      S2: { badgeStyle: { background: "rgba(234,179,8,0.18)", color: "#a16207" }, cardBorderStyle: { borderColor: "rgba(234,179,8,0.30)" }, lfStyle: { color: "#8a6d1f" } },
+      N:  { badgeStyle: { background: "rgba(220,38,38,0.12)", color: "#b91c1c" }, cardBorderStyle: { borderColor: "rgba(220,38,38,0.20)" }, lfStyle: { color: "#9a3b3b" } },
+    };
+    const results = this.KOMO.map(k => {
+      const { cls, limiting } = this.classify(k, vals);
+      return { name: k.name, icon: k.icon, cls, limiting, ...STY[cls] };
+    }).sort((a, b) => ({ S1: 0, S2: 1, N: 2 }[a.cls] - { S1: 0, S2: 1, N: 2 }[b.cls]));
+
+    return {
+      kab: this.state.kab, onKab: this.onKabChange, reset: this.reset,
+      kabList: Object.keys(this.KAB), teksturList: this.TEKSTUR,
+      numFields, tekstur, chips, results,
+    };
+  }
+}
+</script>
+</body>
+</html>
